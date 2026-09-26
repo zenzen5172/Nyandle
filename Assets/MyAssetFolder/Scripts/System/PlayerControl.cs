@@ -40,6 +40,7 @@ public class PlayerController : MonoBehaviour
     [Header("音声")]
     public AudioClip jumpSound;
     public AudioClip deathSound;
+    public AudioClip flameSound;   // 炎を出している間ループ再生する
 
     Rigidbody2D rb;
     Collider2D col;
@@ -107,6 +108,15 @@ public class PlayerController : MonoBehaviour
                 1f);
 
             visual.AddComponent<SpriteRenderer>().sprite = flameSprite;
+        }
+
+        if (flameSound != null)
+        {
+            // 炎オブジェクト自体に付けることで、表示されると鳴り、消えると止まる(死亡時も自動で止まる)
+            var flameAudio = flame.AddComponent<AudioSource>();
+            flameAudio.clip = flameSound;
+            flameAudio.loop = true;
+            flameAudio.playOnAwake = true;
         }
 
         flame.SetActive(false);
