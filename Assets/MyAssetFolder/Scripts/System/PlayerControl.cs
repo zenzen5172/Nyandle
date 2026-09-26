@@ -33,6 +33,10 @@ public class PlayerController : MonoBehaviour
     public float flameHeightOffset = 1f;              // プレイヤー中心からどれだけ上に出すか
     public Sprite flameSprite;                        // 未設定なら判定だけ出る(見た目なし)
 
+    [Header("死亡・リスポーン")]
+    public Vector2 respawnPoint;         // CheckPointLantern などから書き換えられる。初期値は開始位置
+    public float respawnDelay = 0.5f;    // 死んでから復活するまでの時間
+
     [Header("音声")]
     public AudioClip jumpSound;
 
@@ -56,8 +60,10 @@ public class PlayerController : MonoBehaviour
     bool groundJumpSpent;     // この滞空中に地上ジャンプ分を使った or 失ったか
 
     float lastX;
+    bool isDead;
 
     public bool IsGrounded => isGrounded;
+    public bool IsDead => isDead;
 
     void Awake()
     {
@@ -71,6 +77,7 @@ public class PlayerController : MonoBehaviour
         rb.freezeRotation = true;   // コライダーが地面との摩擦で転がるのを防ぐ
         rb.gravityScale = gravityScale;
         jumpCount = maxJumpCount;
+        respawnPoint = transform.position;
         CreateFlame();
     }
 
@@ -104,6 +111,42 @@ public class PlayerController : MonoBehaviour
         flame.SetActive(false);
     }
 
+    // 死亡させ、respawnDelay 秒後に respawnPoint へ復活させる。死亡中に何度呼ばれても1回分だけ
+    public void Die()
+    {
+        if (isDead) return;
+
+        isDead = true;
+        rb.linearVelocity = Vector2.zero;
+        rb.simulated = false;   // 死亡中に落下したりギミックに当たり続けたりしないよう物理から外す
+        spriteRenderer.enabled = false;
+        flame.SetActive(false);
+
+        Invoke(nameof(Respawn), respawnDelay);
+    }
+
+    // すぐに respawnPoint へ戻す。Player.Respawn() と同じ名前なので、ギミックからそのまま呼べる
+    public void Respawn()
+    {
+        CancelInvoke(nameof(Respawn));
+
+        transform.position = new Vector3(respawnPoint.x, respawnPoint.y, transform.position.z);
+        rb.simulated = true;
+        rb.position = respawnPoint;
+        rb.linearVelocity = Vector2.zero;
+
+        // 死ぬ直前のジャンプ入力や上昇状態を持ち越さない
+        jumpBuffer = 0f;
+        coyoteTimer = 0f;
+        isRising = false;
+        canBoost = false;
+        jumpCount = maxJumpCount;
+        groundJumpSpent = false;
+
+        spriteRenderer.enabled = true;
+        isDead = false;
+    }
+
     // 今の滞空中だけ有効なジャンプを与える。着地すると残り回数がリセットされて消える
     public void GrantExtraJump(int amount = 1)
     {
@@ -126,7 +169,7 @@ public class PlayerController : MonoBehaviour
     void Update()
     {
         var kb = Keyboard.current;
-        if (kb == null) return;
+        if (kb == null || isDead) return;
 
         // スペースはインタラクト(ロープ切断など)に割り当てられているのでジャンプには使わない
         if (kb.upArrowKey.wasPressedThisFrame || kb.wKey.wasPressedThisFrame)
@@ -140,6 +183,8 @@ public class PlayerController : MonoBehaviour
 
     void FixedUpdate()
     {
+        if (isDead) return;
+
         jumpBuffer -= Time.fixedDeltaTime;
 
         isGrounded = CheckGrounded();
