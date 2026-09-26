@@ -39,6 +39,7 @@ public class PlayerController : MonoBehaviour
 
     [Header("音声")]
     public AudioClip jumpSound;
+    public AudioClip deathSound;
 
     Rigidbody2D rb;
     Collider2D col;
@@ -121,6 +122,9 @@ public class PlayerController : MonoBehaviour
         rb.simulated = false;   // 死亡中に落下したりギミックに当たり続けたりしないよう物理から外す
         spriteRenderer.enabled = false;
         flame.SetActive(false);
+
+        if (deathSound != null)
+            audioSource.PlayOneShot(deathSound);
 
         Invoke(nameof(Respawn), respawnDelay);
     }
