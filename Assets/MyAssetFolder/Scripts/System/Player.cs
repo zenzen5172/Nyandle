@@ -120,7 +120,7 @@ public class Player : MonoBehaviour
 
         if (jumpable || canGroundJump)
         {
-            if (Input.GetKeyDown(KeyCode.Space))
+            if (Input.GetKeyDown(KeyCode.UpArrow))
             {
                 jumpable = false;
                 rb.linearVelocity = new Vector2(rb.linearVelocity.x, jumpPower);
