@@ -12,8 +12,8 @@ public class CuttableRope : MonoBehaviour
         {
             Player player = collision.GetComponent<Player>();
 
-            // プレイヤーが燃えている（IsOnFire() が true）なら切断！
-            if (player != null && player.IsOnFire())
+            // プレイヤーが燃えている（IsOnFire() が true）、またはスペースキーを押したら切断！
+            if (player != null && (player.IsOnFire() || Input.GetKeyDown(KeyCode.Space)))
             {
                 Cut();
             }
