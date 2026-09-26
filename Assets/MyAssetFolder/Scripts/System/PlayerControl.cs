@@ -128,7 +128,8 @@ public class PlayerController : MonoBehaviour
         var kb = Keyboard.current;
         if (kb == null) return;
 
-        if (kb.spaceKey.wasPressedThisFrame)
+        // スペースはインタラクト(ロープ切断など)に割り当てられているのでジャンプには使わない
+        if (kb.upArrowKey.wasPressedThisFrame || kb.wKey.wasPressedThisFrame)
             jumpBuffer = jumpBufferTime;
 
         // S / 下キーを押している間だけ頭上に炎の判定を出す
@@ -210,7 +211,7 @@ public class PlayerController : MonoBehaviour
     void Jump()
     {
         var kb = Keyboard.current;
-        bool held = kb != null && kb.spaceKey.isPressed;
+        bool held = kb != null && (kb.upArrowKey.isPressed || kb.wKey.isPressed);
 
         if (isRising)
         {
