@@ -77,14 +77,14 @@ public class Cannon : MonoBehaviour
         if (isPowered)
         {
             // 強発射
-            rb.linearVelocity = cannonDirection.normalized * strongPower;
+            rb.linearVelocity = cannonDirection * strongPower;
             player.canControl = false; // 🌟一旦操作不可のままにする
             StartCoroutine(EnablePlayerControl(player, stunDuration)); // 🌟指定秒数後に操作可能にする
         }
         else
         {
             // 弱発射
-            rb.linearVelocity = cannonDirection.normalized * weakPower;
+            rb.linearVelocity = cannonDirection * weakPower;
             player.canControl = true; // 🌟弱発射はすぐに操作可能
         }
 

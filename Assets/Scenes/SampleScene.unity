@@ -43240,20 +43240,34 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 438cea3a5999e9a43940021cea6eb6df, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Player
-  moveSpeed: 7
-  jumpPower: 11
-  jumpable: 1
-  isGround: 1
-  checkRadius: 0.1
+  speed: 8
+  gravityScale: 2.5
   groundLayer:
     serializedVersion: 2
     m_Bits: 64
-  groundCheck: {fileID: 444260109}
-  glowColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
-  fireDuration: 0.4
-  respawnPoint: {x: 0, y: 0}
+  groundCheckDistance: 0.08
+  wallCheckDistance: 0.04
+  tileSize: 1
+  minJumpBlocks: 2
+  maxJumpBlocks: 3.5
+  jumpClearance: 0.25
+  holdStartDelay: 0.08
+  holdTimeToMax: 0.25
+  coyoteTime: 0.1
+  jumpBufferTime: 0.1
   canControl: 1
   isLaunched: 0
+  glowColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
+  fireDuration: 0.4
+  jumpable: 1
+  flameSize: {x: 1, y: 1}
+  flameHeightOffset: 1
+  flameSprite: {fileID: 0}
+  respawnPoint: {x: 0, y: 0}
+  respawnDelay: 0.5
+  jumpSound: {fileID: 0}
+  deathSound: {fileID: 0}
+  flameSound: {fileID: 0}
 --- !u!114 &1800142074
 MonoBehaviour:
   m_ObjectHideFlags: 0
