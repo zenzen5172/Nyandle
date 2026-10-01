@@ -15,7 +15,7 @@ public class Player : MonoBehaviour
     [Header("ジャンプ(タイル基準)")]
     public float tileSize = 1f;           // Tilemapの1マスの大きさ(Grid の Cell Size に合わせる)
     public int minJumpBlocks = 3;         // タップで乗り越えられる壁の高さ(マス数)
-    public float maxJumpBlocks = 3.5f;         // 長押しで乗り越えられる壁の高さ(マス数)
+    public float maxJumpBlocks = 3.5f;    // 長押しで乗り越えられる壁の高さ(マス数)
     public float jumpClearance = 0.25f;   // 壁の上に乗れるよう、指定マス数より余分に飛ぶ高さ(マス数)
     public float holdStartDelay = 0.08f;  // これ以下の短いタップはminちょうどになる
     public float holdTimeToMax = 0.25f;   // これだけ押し続けるとmaxに届く。途中で離せばその分の高さ
@@ -65,7 +65,7 @@ public class Player : MonoBehaviour
     float jumpTime;
     float jumpStartY;
 
-    int maxJumpCount = 0;     // 普段は1(地上ジャンプのみ)
+    int maxJumpCount = 0;     // 普段は0(空中ジャンプ不可。ReJumpStone取得時のみ追加)
     int jumpCount;
     bool groundJumpSpent;     // この滞空中に地上ジャンプ分を使った or 失ったか
 
@@ -272,6 +272,7 @@ public class Player : MonoBehaviour
         return Physics2D.OverlapBox(center, size, 0f, groundLayer);
     }
 
+    // 🌟一方通行（Effector）が設定されている壁をめり込み防止処理から除外するよう修正
     bool IsTouchingWall(float dir)
     {
         if (col == null) return false;
@@ -282,7 +283,17 @@ public class Player : MonoBehaviour
         float edgeX = dir > 0f ? b.max.x : b.min.x;
         Vector2 center = new Vector2(edgeX + dir * wallCheckDistance * 0.5f, b.center.y);
         Vector2 size = new Vector2(wallCheckDistance, height);
-        return Physics2D.OverlapBox(center, size, 0f, groundLayer);
+        Collider2D[] hits = Physics2D.OverlapBoxAll(center, size, 0f, groundLayer);
+        foreach (var hit in hits)
+        {
+            // 自分自身以外のコライダーで、かつ Effector（一方通行）が使われていない通常の壁の場合のみブロック
+            if (hit != col && !hit.usedByEffector)
+            {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     void HorizontalMove()
@@ -352,6 +363,11 @@ public class Player : MonoBehaviour
             groundJumpSpent = true;
 
             fireTimer = fireDuration;
+
+            if (animator != null)
+            {
+                animator.SetTrigger("Jump");
+            }
 
             if (jumpSound != null)
                 audioSource.PlayOneShot(jumpSound);

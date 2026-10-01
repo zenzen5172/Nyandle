@@ -2691,7 +2691,7 @@ Transform:
   m_GameObject: {fileID: 444260108}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: -0.24, z: 0}
+  m_LocalPosition: {x: 0, y: 0.032, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -3232,7 +3232,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 637063416352673667, guid: 882af805cfd446546983234da9e13de8, type: 3}
       propertyPath: strongPower
-      value: 20
+      value: 25
       objectReference: {fileID: 0}
     - target: {fileID: 637063416352673667, guid: 882af805cfd446546983234da9e13de8, type: 3}
       propertyPath: stunDuration
@@ -4608,7 +4608,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 637063416352673667, guid: 882af805cfd446546983234da9e13de8, type: 3}
       propertyPath: cannonDirection.y
-      value: -5
+      value: -1
       objectReference: {fileID: 0}
     - target: {fileID: 2330319617681539767, guid: 882af805cfd446546983234da9e13de8, type: 3}
       propertyPath: m_Name
@@ -6687,7 +6687,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 637063416352673667, guid: 882af805cfd446546983234da9e13de8, type: 3}
       propertyPath: cannonDirection.y
-      value: -5
+      value: -1
       objectReference: {fileID: 0}
     - target: {fileID: 2330319617681539767, guid: 882af805cfd446546983234da9e13de8, type: 3}
       propertyPath: m_Name
@@ -10041,7 +10041,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 637063416352673667, guid: 882af805cfd446546983234da9e13de8, type: 3}
       propertyPath: cannonDirection.y
-      value: -5
+      value: -1
       objectReference: {fileID: 0}
     - target: {fileID: 2330319617681539767, guid: 882af805cfd446546983234da9e13de8, type: 3}
       propertyPath: m_Name
@@ -10100,6 +10100,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 1031064733}
     m_Modifications:
+    - target: {fileID: 1428522848081289821, guid: 355169909a6c2cd4d8fee38ccd86a823, type: 3}
+      propertyPath: m_RotationalOffset
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 1762117478111984391, guid: 355169909a6c2cd4d8fee38ccd86a823, type: 3}
       propertyPath: m_LocalScale.x
       value: 3
@@ -42820,7 +42824,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 637063416352673667, guid: 882af805cfd446546983234da9e13de8, type: 3}
       propertyPath: cannonDirection.y
-      value: -5
+      value: -1
       objectReference: {fileID: 0}
     - target: {fileID: 2330319617681539767, guid: 882af805cfd446546983234da9e13de8, type: 3}
       propertyPath: m_Name
@@ -43123,8 +43127,8 @@ CapsuleCollider2D:
   m_UsedByEffector: 0
   m_CompositeOperation: 0
   m_CompositeOrder: 0
-  m_Offset: {x: 0.016138732, y: 0.02385208}
-  m_Size: {x: 0.4527905, y: 0.5456832}
+  m_Offset: {x: 0.016138732, y: 0.31909657}
+  m_Size: {x: 0.4527905, y: 0.5508232}
   m_Direction: 0
 --- !u!50 &1800142070
 Rigidbody2D:
@@ -43202,7 +43206,7 @@ SpriteRenderer:
   m_SortingLayer: 6
   m_SortingOrder: 0
   m_MaskInteraction: 0
-  m_Sprite: {fileID: 21300000, guid: 5284ef78f3074a942908fc34c7af5446, type: 3}
+  m_Sprite: {fileID: -7172046121233230682, guid: 2f68dc82f9606074da37af0e63adcd4a, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -43221,7 +43225,7 @@ Transform:
   m_GameObject: {fileID: 1800142067}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 75.6, y: -22, z: 0}
+  m_LocalPosition: {x: 73.02, y: -22.33, z: 0}
   m_LocalScale: {x: 2, y: 2, z: 2}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -43241,7 +43245,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Player
   speed: 8
-  gravityScale: 2.5
+  gravityScale: 4
   groundLayer:
     serializedVersion: 2
     m_Bits: 64
@@ -43249,7 +43253,7 @@ MonoBehaviour:
   wallCheckDistance: 0.04
   tileSize: 1
   minJumpBlocks: 2
-  maxJumpBlocks: 3.5
+  maxJumpBlocks: 3
   jumpClearance: 0.25
   holdStartDelay: 0.08
   holdTimeToMax: 0.25
@@ -43347,8 +43351,12 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 398813962}
     - target: {fileID: 637063416352673667, guid: 882af805cfd446546983234da9e13de8, type: 3}
+      propertyPath: strongPower
+      value: 25
+      objectReference: {fileID: 0}
+    - target: {fileID: 637063416352673667, guid: 882af805cfd446546983234da9e13de8, type: 3}
       propertyPath: stunDuration
-      value: 0.4
+      value: 0.8
       objectReference: {fileID: 0}
     - target: {fileID: 637063416352673667, guid: 882af805cfd446546983234da9e13de8, type: 3}
       propertyPath: cannonDirection.x
@@ -43364,11 +43372,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6225515086937768451, guid: 882af805cfd446546983234da9e13de8, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -23.778358
+      value: -24.56
       objectReference: {fileID: 0}
     - target: {fileID: 6225515086937768451, guid: 882af805cfd446546983234da9e13de8, type: 3}
       propertyPath: m_LocalPosition.y
-      value: -15.763244
+      value: -15.78
       objectReference: {fileID: 0}
     - target: {fileID: 6225515086937768451, guid: 882af805cfd446546983234da9e13de8, type: 3}
       propertyPath: m_LocalPosition.z
@@ -43814,11 +43822,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4529366146993640290, guid: 27ba102b874020645bef4b25fbd2c02e, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -30.331131
+      value: -29.01
       objectReference: {fileID: 0}
     - target: {fileID: 4529366146993640290, guid: 27ba102b874020645bef4b25fbd2c02e, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 35.920357
+      value: 33.64
       objectReference: {fileID: 0}
     - target: {fileID: 4529366146993640290, guid: 27ba102b874020645bef4b25fbd2c02e, type: 3}
       propertyPath: m_LocalPosition.z
@@ -45274,6 +45282,10 @@ PrefabInstance:
     - target: {fileID: 637063416352673667, guid: 882af805cfd446546983234da9e13de8, type: 3}
       propertyPath: stunDuration
       value: 0.6
+      objectReference: {fileID: 0}
+    - target: {fileID: 637063416352673667, guid: 882af805cfd446546983234da9e13de8, type: 3}
+      propertyPath: cannonDirection.x
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 637063416352673667, guid: 882af805cfd446546983234da9e13de8, type: 3}
       propertyPath: cannonDirection.y
