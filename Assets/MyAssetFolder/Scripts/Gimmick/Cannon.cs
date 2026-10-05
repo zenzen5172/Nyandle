@@ -33,7 +33,7 @@ public class Cannon : MonoBehaviour
 
         Player player = playerObj.GetComponent<Player>();
         Rigidbody2D rb = playerObj.GetComponent<Rigidbody2D>();
-        SpriteRenderer sr = playerObj.GetComponent<SpriteRenderer>();
+        SpriteRenderer sr = playerObj.GetComponentInChildren<SpriteRenderer>();
 
         // プレイヤーの制御をオフにして大砲の中に隠す
         player.canControl = false;

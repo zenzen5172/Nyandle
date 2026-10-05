@@ -65,9 +65,10 @@ public class Player : MonoBehaviour
     float jumpTime;
     float jumpStartY;
 
-    int maxJumpCount = 0;     // 普段は0(空中ジャンプ不可。ReJumpStone取得時のみ追加)
-    int jumpCount;
-    bool groundJumpSpent;     // この滞空中に地上ジャンプ分を使った or 失ったか
+    [Header("ジャンプ回数")]
+    [SerializeField] int maxJumpCount = 0;     // 普段は0(空中ジャンプ不可。ReJumpStone取得時のみ追加)
+    [SerializeField] int jumpCount;
+    [SerializeField] bool groundJumpSpent;     // この滞空中に地上ジャンプ分を使った or 失ったか
 
     float lastX;
     bool isDead;
