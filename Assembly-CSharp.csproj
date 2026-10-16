@@ -87,6 +87,7 @@
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\TextMeshSpawner.cs" />
     <Compile Include="Assets\MyAssetFolder\Scripts\Gimmick\Key\LookedDoor.cs" />
     <Compile Include="Assets\MyAssetFolder\Scripts\Gimmick\DeathWater.cs" />
+    <Compile Include="Assets\MyAssetFolder\Scripts\Gimmick\Activator\Activator.cs" />
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\CameraController.cs" />
     <Compile Include="Assets\MyAssetFolder\Scripts\Gimmick\BatEnemy.cs" />
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\Benchmark03.cs" />

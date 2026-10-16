@@ -342,8 +342,26 @@ public class Player : MonoBehaviour
             }
         }
 
+        
+    }
+
+    // 大砲で吹き飛ばされている最中(isLaunched == true)以外の上向きの異常な跳ね上がりを防止
+    void KillUnwantedLift()
+    {
+        if (isLaunched) return;
+
+        if (!isRising && rb.linearVelocity.y > 0f)
+            rb.linearVelocity = new Vector2(rb.linearVelocity.x, 0f);
+    }
+
+    void UpdateAppearance()
+    {
+
         if (jumpBuffer > 0f && (isGrounded || coyoteTimer > 0f || jumpCount > 0 || jumpable))
         {
+            if (jumpSound != null)
+                audioSource.PlayOneShot(jumpSound);
+
             rb.linearVelocity = new Vector2(
                 rb.linearVelocity.x, PowerForHeight(HeightForBlocks(minJumpBlocks)));
             jumpStartY = rb.position.y;
@@ -370,22 +388,7 @@ public class Player : MonoBehaviour
                 animator.SetTrigger("Jump");
             }
 
-            if (jumpSound != null)
-                audioSource.PlayOneShot(jumpSound);
         }
-    }
-
-    // 大砲で吹き飛ばされている最中(isLaunched == true)以外の上向きの異常な跳ね上がりを防止
-    void KillUnwantedLift()
-    {
-        if (isLaunched) return;
-
-        if (!isRising && rb.linearVelocity.y > 0f)
-            rb.linearVelocity = new Vector2(rb.linearVelocity.x, 0f);
-    }
-
-    void UpdateAppearance()
-    {
         if (animator != null)
         {
             animator.SetBool("IsGrounded", isGrounded);
