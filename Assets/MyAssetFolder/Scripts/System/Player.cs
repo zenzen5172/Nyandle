@@ -1,9 +1,13 @@
+using System;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.Rendering;
 
 public class Player : MonoBehaviour
 {
+    //リスポーン時に呼ばれるイベント（他のオブジェクトはこれを購読して状態をリセットできる）
+    public static event Action OnRespawn;
+
     //動く速さ
     [SerializeField] float moveSpeed;
 
@@ -142,6 +146,8 @@ public class Player : MonoBehaviour
         canControl = true;
         sr.enabled = true;
         rb.bodyType = RigidbodyType2D.Dynamic;
+
+        OnRespawn?.Invoke();
     }
 
     // 今燃えている（火が付けられる状態）
