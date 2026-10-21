@@ -288,7 +288,7 @@ public class Player : MonoBehaviour
         foreach (var hit in hits)
         {
             // 自分自身以外のコライダーで、かつ Effector（一方通行）が使われていない通常の壁の場合のみブロック
-            if (hit != col && !hit.usedByEffector)
+            if (hit != col && !hit.usedByEffector && !hit.CompareTag("Box"))
             {
                 return true;
             }

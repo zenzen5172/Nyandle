@@ -50,10 +50,12 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\TMP_TextEventHandler.cs" />
+    <Compile Include="Assets\MyAssetFolder\Scripts\Gimmick\Cannon\CannonFuse.cs" />
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\EnvMapAnimator.cs" />
     <Compile Include="Assets\MyAssetFolder\Scripts\System\PlayerControl.cs" />
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\TMP_TextSelector_A.cs" />
     <Compile Include="Assets\MyAssetFolder\Scripts\System\Player.cs" />
+    <Compile Include="Assets\MyAssetFolder\Scripts\Activator\Activator.cs" />
     <Compile Include="Assets\MyAssetFolder\Scripts\Gimmick\Key\PlayerInventory.cs" />
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\Benchmark02.cs" />
     <Compile Include="Assets\MyAssetFolder\Scripts\System\ReJumpStone.cs" />
@@ -63,12 +65,10 @@
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\VertexShakeB.cs" />
     <Compile Include="Assets\MyAssetFolder\Scripts\System\IgnoreFire.cs" />
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\VertexJitter.cs" />
-    <Compile Include="Assets\MyAssetFolder\Scripts\Gimmick\CannonFuse.cs" />
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\TMP_UiFrameRateCounter.cs" />
     <Compile Include="Assets\MyAssetFolder\Scripts\Gimmick\DropBlock.cs" />
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\VertexZoom.cs" />
     <Compile Include="Assets\MyAssetFolder\Scripts\Gimmick\MovingPlatform.cs" />
-    <Compile Include="Assets\MyAssetFolder\Scripts\Gimmick\Cannon.cs" />
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\TMP_TextSelector_B.cs" />
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\SkewTextExample.cs" />
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\WarpTextExample.cs" />
@@ -87,10 +87,11 @@
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\TextMeshSpawner.cs" />
     <Compile Include="Assets\MyAssetFolder\Scripts\Gimmick\Key\LookedDoor.cs" />
     <Compile Include="Assets\MyAssetFolder\Scripts\Gimmick\DeathWater.cs" />
-    <Compile Include="Assets\MyAssetFolder\Scripts\Gimmick\Activator\Activator.cs" />
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\CameraController.cs" />
     <Compile Include="Assets\MyAssetFolder\Scripts\Gimmick\BatEnemy.cs" />
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\Benchmark03.cs" />
+    <Compile Include="Assets\MyAssetFolder\Scripts\Gimmick\Pendulum\PendulumRope.cs" />
+    <Compile Include="Assets\MyAssetFolder\Scripts\Gimmick\Cannon\Cannon.cs" />
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\DropdownSample.cs" />
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\VertexColorCycler.cs" />
     <Compile Include="Assets\MyAssetFolder\Scripts\Scene\TitleSceneManager.cs" />
@@ -103,6 +104,7 @@
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\TMP_TextEventCheck.cs" />
     <Compile Include="Assets\MyAssetFolder\Scripts\System\CheckPointLantern.cs" />
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\TextMeshProFloatingText.cs" />
+    <Compile Include="Assets\MyAssetFolder\Scripts\Gimmick\Pendulum\PendulumBox.cs" />
     <Compile Include="Assets\MyAssetFolder\Scripts\Gimmick\Torch.cs" />
   </ItemGroup>
   <ItemGroup>

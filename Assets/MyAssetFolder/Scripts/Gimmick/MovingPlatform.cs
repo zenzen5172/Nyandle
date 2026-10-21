@@ -34,11 +34,16 @@ public class MovingPlatform : MonoBehaviour
         }
     }
 
-    private void OnCollisionEnter2D(Collision2D collision)//プレイヤーが乗ったとき一緒に動く
+    private void OnCollisionEnter2D(Collision2D collision)
     {
         if (collision.gameObject.CompareTag("Player"))
         {
-            collision.transform.SetParent(transform);
+            Debug.Log("Playerが接触しました！ normal.y: " + collision.contacts[0].normal.y);
+
+            if (collision.contacts[0].normal.y < -0.5f)
+            {
+                collision.transform.SetParent(transform);
+            }
         }
     }
     private void OnCollisionExit2D(Collision2D collision)

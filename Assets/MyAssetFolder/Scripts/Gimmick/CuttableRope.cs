@@ -25,11 +25,11 @@ public class CuttableRope : MonoBehaviour
         // 1. 箱を吊るしているジョイントを破壊して、箱を落下させる
         if (boxJoint != null)
         {
-            Destroy(boxJoint);
+            boxJoint.enabled = false;
         }
 
         // 2. 綱（このオブジェクト自身）をゲーム画面から完全に消す
-        Destroy(gameObject);
+        gameObject.SetActive(false);
 
         // ※ もし「後で復活させたい」場合は Destroy(gameObject) の代わりに
         // gameObject.SetActive(false); を使用してください。

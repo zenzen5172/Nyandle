@@ -5,6 +5,7 @@ TagManager:
   serializedVersion: 3
   tags:
   - Ground
+  - Box
   layers:
   - Default
   - TransparentFX
@@ -14,7 +15,7 @@ TagManager:
   - UI
   - Ground
   - BackGround
-  - 
+  - Box
   - 
   - 
   - 
@@ -53,6 +54,9 @@ TagManager:
     locked: 0
   - name: FrontObject
     uniqueID: 3504622055
+    locked: 0
+  - name: Box
+    uniqueID: 1393088907
     locked: 0
   - name: Enemy
     uniqueID: 2639733099
