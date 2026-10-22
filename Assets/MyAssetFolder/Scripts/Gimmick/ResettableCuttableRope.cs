@@ -1,4 +1,4 @@
-using UnityEngine;
+ using UnityEngine;
 
 // CuttableRopeと同じ切断処理だが、プレイヤーがリスポーンすると
 // 綱・箱とも切る前の状態に自動的に戻る版。

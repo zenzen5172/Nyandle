@@ -8,7 +8,7 @@ public class Player : MonoBehaviour
     public static event Action OnRespawn;
 
     //動く速さ
-    [SerializeField] float moveSpeed;
+    [SerializeField] float moveSpeed = 5f;
 
     [Header("接地判定")]
     public LayerMask groundLayer;
@@ -24,6 +24,7 @@ public class Player : MonoBehaviour
     public float holdTimeToMax = 0.25f;   // これだけ押し続けるとmaxに届く。途中で離せばその分の高さ
     public float coyoteTime = 0.1f;       // 崖を踏み外した後もジャンプを受け付ける猶予
     public float jumpBufferTime = 0.1f;   // 着地直前の入力を覚えておく時間
+    [SerializeField] public float gravityScale = 1.5f;
 
     [Header("大砲に関する行動制限")]
     public bool canControl = true;
@@ -57,6 +58,7 @@ public class Player : MonoBehaviour
     SpriteRenderer spriteRenderer;
     AudioSource audioSource;
     GameObject flame;
+    SpriteRenderer sr;
 
     float jumpBuffer;
     float coyoteTimer;
@@ -93,6 +95,8 @@ public class Player : MonoBehaviour
         spriteRenderer = gameObject.GetComponentInChildren<SpriteRenderer>();
         animator = gameObject.GetComponentInChildren<Animator>();
         audioSource = GetComponent<AudioSource>();
+        sr = GetComponent<SpriteRenderer>();
+
         if (audioSource == null)
             audioSource = gameObject.AddComponent<AudioSource>();
 
@@ -305,11 +309,25 @@ public class Player : MonoBehaviour
         var kb = Keyboard.current;
         if (kb == null) return;
 
-        canControl = true;
-        sr.enabled = true;
-        rb.bodyType = RigidbodyType2D.Dynamic;
+        // 1. 左右の入力を取得
+        float moveInput = 0f;
+        if (kb.leftArrowKey.isPressed || kb.aKey.isPressed) moveInput = -1f;
+        if (kb.rightArrowKey.isPressed || kb.dKey.isPressed) moveInput = 1f;
 
-        OnRespawn?.Invoke();
+        // 2. 壁へのめり込み・張り付きチェック
+        if (moveInput != 0f && IsTouchingWall(moveInput))
+        {
+            moveInput = 0f;
+        }
+
+        // 3. 移動速度の適用
+        rb.linearVelocity = new Vector2(moveInput * moveSpeed, rb.linearVelocity.y);
+
+        // 4. スプライト反転用に lastX を更新
+        if (moveInput != 0f)
+        {
+            lastX = moveInput;
+        }
     }
 
     void Jump()
@@ -317,6 +335,35 @@ public class Player : MonoBehaviour
         var kb = Keyboard.current;
         bool held = kb != null && (kb.upArrowKey.isPressed || kb.wKey.isPressed || kb.spaceKey.isPressed);
 
+        // --- 新規: ジャンプ開始処理 (UpdateAppearanceから移動) ---
+        if (jumpBuffer > 0f && (isGrounded || coyoteTimer > 0f || jumpCount > 0 || jumpable))
+        {
+            if (jumpSound != null) audioSource.PlayOneShot(jumpSound);
+
+            rb.linearVelocity = new Vector2(rb.linearVelocity.x, PowerForHeight(HeightForBlocks(minJumpBlocks)));
+            jumpStartY = rb.position.y;
+            jumpTime = 0f;
+            isRising = true;
+            canBoost = true;
+            jumpBuffer = 0f;
+            coyoteTimer = 0f;
+
+            canControl = true;
+            isLaunched = false;
+            jumpable = false;
+
+            if (!isGrounded && coyoteTimer <= 0f && jumpCount > 0)
+            {
+                jumpCount--;
+            }
+            groundJumpSpent = true;
+            fireTimer = fireDuration;
+
+            if (animator != null) animator.SetTrigger("Jump");
+        }
+        // ----------------------------------------------------------
+
+        // 既存のジャンプ延長処理（ボタン長押しで高く飛ぶ）
         if (isRising)
         {
             jumpTime += Time.fixedDeltaTime;
@@ -339,8 +386,6 @@ public class Player : MonoBehaviour
                     rb.linearVelocity = new Vector2(rb.linearVelocity.x, PowerForHeight(remaining));
             }
         }
-
-        
     }
 
     // 大砲で吹き飛ばされている最中(isLaunched == true)以外の上向きの異常な跳ね上がりを防止
@@ -354,39 +399,6 @@ public class Player : MonoBehaviour
 
     void UpdateAppearance()
     {
-
-        if (jumpBuffer > 0f && (isGrounded || coyoteTimer > 0f || jumpCount > 0 || jumpable))
-        {
-            if (jumpSound != null)
-                audioSource.PlayOneShot(jumpSound);
-
-            rb.linearVelocity = new Vector2(
-                rb.linearVelocity.x, PowerForHeight(HeightForBlocks(minJumpBlocks)));
-            jumpStartY = rb.position.y;
-            jumpTime = 0f;
-            isRising = true;
-            canBoost = true;
-            jumpBuffer = 0f;
-            coyoteTimer = 0f;
-
-            canControl = true;
-            isLaunched = false;
-            jumpable = false;
-
-            if (!isGrounded && coyoteTimer <= 0f && jumpCount > 0)
-            {
-                jumpCount--;
-            }
-            groundJumpSpent = true;
-
-            fireTimer = fireDuration;
-
-            if (animator != null)
-            {
-                animator.SetTrigger("Jump");
-            }
-
-        }
         if (animator != null)
         {
             animator.SetBool("IsGrounded", isGrounded);
@@ -394,6 +406,7 @@ public class Player : MonoBehaviour
             animator.SetFloat("vSpeed", rb.linearVelocity.y);
         }
 
+        // スプライトの反転 (lastX は HorizontalMove で更新されるようになります)
         if (lastX > 0f)
         {
             spriteRenderer.flipX = false;

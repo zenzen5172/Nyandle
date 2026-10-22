@@ -23,15 +23,15 @@ public class BatEnemy : MonoBehaviour
     [SerializeField] float cooldownTime = 2f;
 
     [Header("Playerの光に当たったときの弱体化")]
-    [SerializeField] float hitTime = 1f; // この秒数、光に当たり続けると死ぬ
-    [SerializeField] float lightRadius = 20f; // Playerの光が届く範囲
-    [SerializeField] float recoverRate = 1f; // 光に当たっていないときの回復速度の倍率
-    [SerializeField] float closeDamageMultiplier = 2f; // Playerに密着したときの最大ダメージ倍率（近いほどHitTimeが速く減る）
+    [SerializeField] float hitTime = 7f; // この秒数、光に当たり続けると死ぬ
+    [SerializeField] float lightRadius = 8f; // Playerの光が届く範囲
+    [SerializeField] float recoverRate = 3f; // 光に当たっていないときの回復速度の倍率
+    [SerializeField] float closeDamageMultiplier = 3f; // Playerに密着したときの最大ダメージ倍率（近いほどHitTimeが速く減る）
     [SerializeField] float hurtGlowIntensity = 6f; // 黒いスプライトでも赤く光らせるためのオーバーブライト値（HDR）
 
     private SpriteRenderer spriteRenderer;
     private Color originalColor;
-    private float hitTimer = 0f; // 0〜hitTimeで蓄積し、hitTimeに達すると死ぬ
+    [SerializeField ]private float hitTimer = 0f; // 0〜hitTimeで蓄積し、hitTimeに達すると死ぬ
 
     private Vector2 startPos;
     private Vector2 targetPos;

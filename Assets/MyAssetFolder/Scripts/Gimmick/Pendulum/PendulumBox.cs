@@ -12,6 +12,7 @@ public class PendulumPlatform : MonoBehaviour
 
     private void FixedUpdate()
     {
+        // プレイヤーが乗っている時だけ、足場の移動量（差分）をプレイヤーにも加算する
         if (playerTransform != null)
         {
             Vector3 deltaPosition = transform.position - lastPosition;
@@ -19,23 +20,29 @@ public class PendulumPlatform : MonoBehaviour
         }
         lastPosition = transform.position;
     }
+
     private void OnCollisionEnter2D(Collision2D collision)
     {
         if (collision.gameObject.CompareTag("Player"))
         {
-            Debug.Log("Playerが接触しました！ normal.y: " + collision.contacts[0].normal.y);
-
-            if (collision.contacts[0].normal.y < -0.5f)
+            // プレイヤーのY座標が足場のY座標より上にあるか（上から乗ったか）を判定
+            if (collision.transform.position.y > transform.position.y)
             {
-                collision.transform.SetParent(transform);
+                // 修正ポイント：SetParentは使わず、playerTransformに代入するだけ！
+                playerTransform = collision.transform;
             }
         }
     }
+
     private void OnCollisionExit2D(Collision2D collision)
     {
         if (collision.gameObject.CompareTag("Player"))
         {
-            collision.transform.SetParent(null);
+            // プレイヤーが足場から離れたら null に戻して追従を止める
+            if (playerTransform == collision.transform)
+            {
+                playerTransform = null;
+            }
         }
     }
 }

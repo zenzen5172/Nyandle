@@ -52,9 +52,7 @@
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\TMP_TextEventHandler.cs" />
     <Compile Include="Assets\MyAssetFolder\Scripts\Gimmick\Cannon\CannonFuse.cs" />
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\EnvMapAnimator.cs" />
-    <Compile Include="Assets\MyAssetFolder\Scripts\System\PlayerControl.cs" />
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\TMP_TextSelector_A.cs" />
-    <Compile Include="Assets\MyAssetFolder\Scripts\System\PlayerControl.cs" />
     <Compile Include="Assets\MyAssetFolder\Scripts\System\Player.cs" />
     <Compile Include="Assets\MyAssetFolder\Scripts\Activator\Activator.cs" />
     <Compile Include="Assets\MyAssetFolder\Scripts\Gimmick\Key\PlayerInventory.cs" />
@@ -77,6 +75,7 @@
     <Compile Include="Assets\MyAssetFolder\Scripts\System\StageCameraManager.cs" />
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\TMP_TextInfoDebugTool.cs" />
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\VertexShakeA.cs" />
+    <Compile Include="Assets\MyAssetFolder\Scripts\Archive\PlayerControl.cs" />
     <Compile Include="Assets\MyAssetFolder\Scripts\Gimmick\CuttableRope.cs" />
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\Benchmark01_UGUI.cs" />
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\SimpleScript.cs" />
@@ -105,8 +104,8 @@
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\TMP_TextEventCheck.cs" />
     <Compile Include="Assets\MyAssetFolder\Scripts\System\CheckPointLantern.cs" />
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\TextMeshProFloatingText.cs" />
-    <Compile Include="Assets\MyAssetFolder\Scripts\Gimmick\Pendulum\PendulumBox.cs" />
     <Compile Include="Assets\MyAssetFolder\Scripts\Gimmick\ResettableCuttableRope.cs" />
+    <Compile Include="Assets\MyAssetFolder\Scripts\Gimmick\Pendulum\PendulumBox.cs" />
     <Compile Include="Assets\MyAssetFolder\Scripts\Gimmick\Torch.cs" />
   </ItemGroup>
   <ItemGroup>
