@@ -1,11 +1,14 @@
+using System;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
 public class Player : MonoBehaviour
 {
-    [Header("移動")]
-    public float speed = 5f;
-    public float gravityScale = 2.5f;   // 重力
+    //リスポーン時に呼ばれるイベント（他のオブジェクトはこれを購読して状態をリセットできる）
+    public static event Action OnRespawn;
+
+    //動く速さ
+    [SerializeField] float moveSpeed;
 
     [Header("接地判定")]
     public LayerMask groundLayer;
@@ -302,16 +305,11 @@ public class Player : MonoBehaviour
         var kb = Keyboard.current;
         if (kb == null) return;
 
-        float x = 0f;
-        if (kb.aKey.isPressed || kb.leftArrowKey.isPressed) x = -1f;
-        if (kb.dKey.isPressed || kb.rightArrowKey.isPressed) x = 1f;
+        canControl = true;
+        sr.enabled = true;
+        rb.bodyType = RigidbodyType2D.Dynamic;
 
-        lastX = x;
-
-        if (x != 0f && IsTouchingWall(x))
-            x = 0f;
-
-        rb.linearVelocity = new Vector2(x * speed, rb.linearVelocity.y);
+        OnRespawn?.Invoke();
     }
 
     void Jump()

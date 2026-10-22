@@ -22,6 +22,17 @@ public class BatEnemy : MonoBehaviour
     [Header("次の攻撃までのインターバル（秒）")]
     [SerializeField] float cooldownTime = 2f;
 
+    [Header("Playerの光に当たったときの弱体化")]
+    [SerializeField] float hitTime = 1f; // この秒数、光に当たり続けると死ぬ
+    [SerializeField] float lightRadius = 20f; // Playerの光が届く範囲
+    [SerializeField] float recoverRate = 1f; // 光に当たっていないときの回復速度の倍率
+    [SerializeField] float closeDamageMultiplier = 2f; // Playerに密着したときの最大ダメージ倍率（近いほどHitTimeが速く減る）
+    [SerializeField] float hurtGlowIntensity = 6f; // 黒いスプライトでも赤く光らせるためのオーバーブライト値（HDR）
+
+    private SpriteRenderer spriteRenderer;
+    private Color originalColor;
+    private float hitTimer = 0f; // 0〜hitTimeで蓄積し、hitTimeに達すると死ぬ
+
     private Vector2 startPos;
     private Vector2 targetPos;
     private Transform currentCeilingPoint;
@@ -49,6 +60,12 @@ public class BatEnemy : MonoBehaviour
         {
             Debug.LogWarning("天井の待機ポイント (Ceiling Points) が設定されていません！");
         }
+
+        spriteRenderer = GetComponent<SpriteRenderer>();
+        if (spriteRenderer != null)
+        {
+            originalColor = spriteRenderer.color;
+        }
     }
 
     void Update()
@@ -60,6 +77,52 @@ public class BatEnemy : MonoBehaviour
             {
                 StartCoroutine(SwoopAttack());
             }
+        }
+
+        UpdateLightDamage();
+    }
+
+    // Playerの光（＝距離がLightRadius以内）に当たり続けるとダメージが蓄積し、
+    // 当たっていない間は徐々に回復する
+    private void UpdateLightDamage()
+    {
+        if (player == null) return;
+
+        float distance = Vector2.Distance(transform.position, player.position);
+        bool isLit = distance <= lightRadius;
+
+        if (isLit)
+        {
+            // Playerに近いほどHitTimeが速く減る（＝ダメージが速く蓄積する）
+            float closeness = 1f - Mathf.Clamp01(distance / lightRadius);
+            float damageMultiplier = Mathf.Lerp(1f, closeDamageMultiplier, closeness);
+            hitTimer += Time.deltaTime * damageMultiplier;
+        }
+        else
+        {
+            hitTimer -= Time.deltaTime * recoverRate;
+        }
+
+        hitTimer = Mathf.Clamp(hitTimer, 0f, hitTime);
+
+        if (spriteRenderer != null)
+        {
+            // 通常のColor.Lerpだと黒に近いスプライトを赤くできないため、
+            // オーバーブライト（1を超える値）の赤をHDRで加算的に乗算して光らせる
+            float t = hitTimer / hitTime;
+            Color hdrRed = new Color(hurtGlowIntensity, 0f, 0f, 1f);
+            spriteRenderer.color = Color.Lerp(originalColor, hdrRed, t);
+        }
+        else
+        {
+            Debug.LogWarning("BatEnemy: spriteRenderer is null, color will not update");
+        }
+
+        Debug.Log($"BatEnemy hitTimer={hitTimer:F2}/{hitTime} isLit={isLit} distance={distance:F2}");
+
+        if (hitTimer >= hitTime)
+        {
+            Destroy(gameObject);
         }
     }
 
