@@ -23,22 +23,19 @@ public class PendulumPlatform : MonoBehaviour
     {
         if (collision.gameObject.CompareTag("Player"))
         {
-            // 上から乗った場合のみターゲットに設定
+            Debug.Log("Playerが接触しました！ normal.y: " + collision.contacts[0].normal.y);
+
             if (collision.contacts[0].normal.y < -0.5f)
             {
-                playerTransform = collision.transform;
+                collision.transform.SetParent(transform);
             }
         }
     }
-
     private void OnCollisionExit2D(Collision2D collision)
     {
         if (collision.gameObject.CompareTag("Player"))
         {
-            if (playerTransform == collision.transform)
-            {
-                playerTransform = null;
-            }
+            collision.transform.SetParent(null);
         }
     }
 }
