@@ -335,7 +335,6 @@ public class Player : MonoBehaviour
         var kb = Keyboard.current;
         bool held = kb != null && (kb.upArrowKey.isPressed || kb.wKey.isPressed || kb.spaceKey.isPressed);
 
-        // --- 新規: ジャンプ開始処理 (UpdateAppearanceから移動) ---
         if (jumpBuffer > 0f && (isGrounded || coyoteTimer > 0f || jumpCount > 0 || jumpable))
         {
             if (jumpSound != null) audioSource.PlayOneShot(jumpSound);
@@ -348,8 +347,10 @@ public class Player : MonoBehaviour
             jumpBuffer = 0f;
             coyoteTimer = 0f;
 
-            canControl = true;
-            isLaunched = false;
+            if (!isLaunched)
+            {
+                canControl = true;
+            }
             jumpable = false;
 
             if (!isGrounded && coyoteTimer <= 0f && jumpCount > 0)
@@ -361,9 +362,7 @@ public class Player : MonoBehaviour
 
             if (animator != null) animator.SetTrigger("Jump");
         }
-        // ----------------------------------------------------------
-
-        // 既存のジャンプ延長処理（ボタン長押しで高く飛ぶ）
+    
         if (isRising)
         {
             jumpTime += Time.fixedDeltaTime;
