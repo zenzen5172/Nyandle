@@ -81,6 +81,19 @@ public class Player : MonoBehaviour
     public bool IsGrounded => isGrounded;
     public bool IsDead => isDead;
 
+
+    // 🌟【追加】弓矢に関する設定
+    [Header("弓矢(Mキー)")]
+    public GameObject bowAndArrow;      // 構えている用の弓矢オブジェクト(Playerの子オブジェクト)
+    public GameObject arrowPrefab;      // 発射する矢のプレハブ
+    public Transform arrowSpawnPoint;   // 矢が発射される位置と向き
+    public float swingSpeed = 5f;       // 振り子の往復スピード
+    public float swingAngle = 60f;      // 左右(上下)の最大角度 (60度なら合計120度)
+    public float shootForce = 20f;      // 矢を発射する力
+    private bool isAiming = false;      // 弓を構えているか
+    public float bowTimeout = 5f;       // 【追加】弓が強制的に消えるまでの時間（秒）
+    private float aimTimer = 0f;
+
     // 🌟【追加】CannonFuseやCuttableRopeが参照する「燃えている状態か」の判定
     public bool IsOnFire()
     {
@@ -105,6 +118,12 @@ public class Player : MonoBehaviour
         jumpCount = maxJumpCount;
         respawnPoint = transform.position;
         CreateFlame();
+
+        // 🌟【追加】最初は弓矢を非表示にしておく
+        if (bowAndArrow != null)
+        {
+            bowAndArrow.SetActive(false);
+        }
     }
 
     void CreateFlame()
@@ -158,6 +177,10 @@ public class Player : MonoBehaviour
         if (deathSound != null)
             audioSource.PlayOneShot(deathSound);
 
+        // 🌟【追加】死亡時に弓を隠す
+        isAiming = false;
+        if (bowAndArrow != null) bowAndArrow.SetActive(false);
+
         Invoke(nameof(Respawn), respawnDelay);
     }
 
@@ -185,6 +208,12 @@ public class Player : MonoBehaviour
         spriteRenderer.enabled = true;
         rb.bodyType = RigidbodyType2D.Dynamic;
         isDead = false;
+
+        // 🌟【追加】リスポーン時に弓をリセット
+        isAiming = false;
+        if (bowAndArrow != null) bowAndArrow.SetActive(false);
+
+        OnRespawn?.Invoke(); // 既存のイベント呼び出しがあれば
     }
 
     public void GrantExtraJump(int amount = 1)
@@ -230,7 +259,83 @@ public class Player : MonoBehaviour
         bool flameHeld = kb.sKey.isPressed || kb.downArrowKey.isPressed;
         if (flame.activeSelf != flameHeld)
             flame.SetActive(flameHeld);
+
+        // 🌟【追加】Mキーでの弓矢の操作 (操作可能な時のみ)
+        if (canControl)
+        {
+            // Mキーを押した瞬間：構えてタイマーをリセット
+            if (kb.mKey.wasPressedThisFrame)
+            {
+                isAiming = true;
+                aimTimer = 0f; // タイマーを0に戻す
+                if (bowAndArrow != null) bowAndArrow.SetActive(true);
+            }
+
+            // Mキーを押し続けている間：往復回転 ＋ タイムアウト処理
+            if (kb.mKey.isPressed && isAiming)
+            {
+                aimTimer += Time.deltaTime; // 経過時間を足していく
+
+                if (aimTimer >= bowTimeout)
+                {
+                    // 5秒経過したら強制的に構えを解除して消す（発射はしない）
+                    isAiming = false;
+                    if (bowAndArrow != null) bowAndArrow.SetActive(false);
+                }
+                else
+                {
+                    // まだ時間内なら弓を上下に動かす
+                    float sineWave = Mathf.Sin(Time.time * swingSpeed);
+                    float currentAngle = sineWave * swingAngle;
+
+                    // 左を向いている時はベースの角度を180度にする
+                    float baseAngle = spriteRenderer.flipX ? 180f : 0f;
+
+                    if (bowAndArrow != null)
+                    {
+                        bowAndArrow.transform.localRotation = Quaternion.Euler(0, 0, baseAngle + currentAngle);
+                    }
+                }
+            }
+
+            // Mキーを離した瞬間：発射（※時間切れでisAimingがfalseになっていれば発射されません）
+            if (kb.mKey.wasReleasedThisFrame && isAiming)
+            {
+                isAiming = false;
+                if (bowAndArrow != null) bowAndArrow.SetActive(false);
+                ShootArrow();
+            }
+        }
+
+        if (fireTimer > 0)
+        {
+            fireTimer -= Time.deltaTime;
+            spriteRenderer.color = Color.orange;
+        }
+        else
+        {
+            spriteRenderer.color = (jumpable || isGrounded) ? glowColor : Color.gray;
+        }
+
+        if (flame.activeSelf != flameHeld)
+            flame.SetActive(flameHeld);
     }
+        // 🌟【追加】矢を発射する処理
+        void ShootArrow()
+        {
+            if (arrowPrefab == null || arrowSpawnPoint == null) return;
+
+            // 矢を生成
+            GameObject firedArrow = Instantiate(arrowPrefab, arrowSpawnPoint.position, arrowSpawnPoint.rotation);
+
+            // 矢のRigidbody2Dを取得して前方に飛ばす
+            Rigidbody2D rbArrow = firedArrow.GetComponent<Rigidbody2D>();
+            if (rbArrow != null)
+            {
+                // 2Dの場合、transform.right がローカルの正面（X軸方向）になる
+                rbArrow.linearVelocity = arrowSpawnPoint.right * shootForce;
+            }
+        }
 
     void FixedUpdate()
     {
@@ -273,6 +378,8 @@ public class Player : MonoBehaviour
 
     bool CheckGrounded()
     {
+        if (rb.linearVelocity.y > 0.1f) return false;
+
         if (col == null) return false;
         Bounds b = col.bounds;
         Vector2 center = new Vector2(b.center.x, b.min.y - groundCheckDistance * 0.5f);
@@ -428,4 +535,6 @@ public class Player : MonoBehaviour
         Gizmos.color = isGrounded ? Color.green : Color.red;
         Gizmos.DrawWireCube(center, size);
     }
+
+    
 }

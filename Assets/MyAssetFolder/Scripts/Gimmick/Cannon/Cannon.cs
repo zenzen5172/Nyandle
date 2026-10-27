@@ -86,6 +86,7 @@ public class Cannon : MonoBehaviour
             // 弱発射
             rb.linearVelocity = cannonDirection * weakPower;
             player.canControl = true; // 🌟弱発射はすぐに操作可能
+            player.isLaunched = false;
         }
 
         yield return new WaitForSeconds(0.5f);
@@ -99,6 +100,7 @@ public class Cannon : MonoBehaviour
         if (player != null)
         {
             player.canControl = true;
+            player.isLaunched = false;
         }
     }
 }

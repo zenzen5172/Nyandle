@@ -6,18 +6,20 @@ public class ReJumpStone : MonoBehaviour
     private SpriteRenderer sr;
     private Collider2D col;
     private Player playerRef;
+    private Color stoneColor;
 
     private void Start()
     {
         sr = GetComponent<SpriteRenderer>();
         col = GetComponent<Collider2D>();
+        stoneColor = sr.color;
     }
     
     private void Update()
     {
         if (playerRef != null && playerRef.isGround) //プレイヤーがこの石を取った後、地面についたら
         {
-            sr.color = Color.yellow;
+            sr.color = stoneColor;
             col.enabled = true;
 
             playerRef = null;
