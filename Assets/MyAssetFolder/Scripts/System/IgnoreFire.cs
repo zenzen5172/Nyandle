@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class IgnoreFire : MonoBehaviour
+public class IgnoreFire : MonoBehaviour, IIgnitable
 {
     public GameObject fire;
     // Start is called once before the first execution of Update after the MonoBehaviour is created
@@ -22,6 +22,15 @@ public class IgnoreFire : MonoBehaviour
             {
                 fire.SetActive(true);
             }
+        }
+    }
+
+    // 火の矢が当たったときも着火する
+    public void Ignite(GameObject source)
+    {
+        if (fire != null)
+        {
+            fire.SetActive(true);
         }
     }
 }

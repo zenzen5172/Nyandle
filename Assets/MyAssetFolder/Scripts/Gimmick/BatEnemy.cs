@@ -1,7 +1,7 @@
 using System.Collections;
 using UnityEngine;
 
-public class BatEnemy : MonoBehaviour
+public class BatEnemy : MonoBehaviour, IIgnitable
 {
     [Header("ターゲット（プレイヤー）")]
     [SerializeField] Transform player;
@@ -28,6 +28,9 @@ public class BatEnemy : MonoBehaviour
     [SerializeField] float recoverRate = 3f; // 光に当たっていないときの回復速度の倍率
     [SerializeField] float closeDamageMultiplier = 3f; // Playerに密着したときの最大ダメージ倍率（近いほどHitTimeが速く減る）
     [SerializeField] float hurtGlowIntensity = 6f; // 黒いスプライトでも赤く光らせるためのオーバーブライト値（HDR）
+
+    [Header("火の矢が当たったときのダメージ（HitTimeに何秒ぶん加算するか）")]
+    [SerializeField] float arrowDamage = 3f;
 
     private SpriteRenderer spriteRenderer;
     private Color originalColor;
@@ -120,6 +123,16 @@ public class BatEnemy : MonoBehaviour
 
         Debug.Log($"BatEnemy hitTimer={hitTimer:F2}/{hitTime} isLit={isLit} distance={distance:F2}");
 
+        if (hitTimer >= hitTime)
+        {
+            Destroy(gameObject);
+        }
+    }
+
+    // 火の矢が当たったときのダメージ（光と同じく hitTimer に蓄積し、HitTime に達したら死ぬ）
+    public void Ignite(GameObject source)
+    {
+        hitTimer = Mathf.Min(hitTimer + arrowDamage, hitTime);
         if (hitTimer >= hitTime)
         {
             Destroy(gameObject);
