@@ -31,10 +31,12 @@ public class BatEnemy : MonoBehaviour, IIgnitable
 
     [Header("火の矢が当たったときのダメージ（HitTimeに何秒ぶん加算するか）")]
     [SerializeField] float arrowDamage = 3f;
+    [SerializeField] float arrowNoRecoverTime = 2f; // 矢が当たってから回復しない時間（光の外から撃っても連続ヒットでダメージが溜まるように）
 
     private SpriteRenderer spriteRenderer;
     private Color originalColor;
     [SerializeField ]private float hitTimer = 0f; // 0〜hitTimeで蓄積し、hitTimeに達すると死ぬ
+    private float arrowNoRecoverTimer = 0f;
 
     private Vector2 startPos;
     private Vector2 targetPos;
@@ -94,6 +96,8 @@ public class BatEnemy : MonoBehaviour, IIgnitable
         float distance = Vector2.Distance(transform.position, player.position);
         bool isLit = distance <= lightRadius;
 
+        if (arrowNoRecoverTimer > 0f) arrowNoRecoverTimer -= Time.deltaTime;
+
         if (isLit)
         {
             // Playerに近いほどHitTimeが速く減る（＝ダメージが速く蓄積する）
@@ -101,7 +105,7 @@ public class BatEnemy : MonoBehaviour, IIgnitable
             float damageMultiplier = Mathf.Lerp(1f, closeDamageMultiplier, closeness);
             hitTimer += Time.deltaTime * damageMultiplier;
         }
-        else
+        else if (arrowNoRecoverTimer <= 0f)
         {
             hitTimer -= Time.deltaTime * recoverRate;
         }
@@ -133,6 +137,7 @@ public class BatEnemy : MonoBehaviour, IIgnitable
     public void Ignite(GameObject source)
     {
         hitTimer = Mathf.Min(hitTimer + arrowDamage, hitTime);
+        arrowNoRecoverTimer = arrowNoRecoverTime;
         if (hitTimer >= hitTime)
         {
             Destroy(gameObject);
