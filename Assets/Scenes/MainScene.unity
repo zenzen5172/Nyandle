@@ -11407,6 +11407,8 @@ MonoBehaviour:
   recoverRate: 3
   closeDamageMultiplier: 3
   hurtGlowIntensity: 6
+  arrowDamage: 3
+  arrowNoRecoverTime: 2
   hitTimer: 0
 --- !u!212 &1098494022
 SpriteRenderer:
@@ -49754,6 +49756,7 @@ GameObject:
   - component: {fileID: 1800142073}
   - component: {fileID: 1800142075}
   - component: {fileID: 1800142076}
+  - component: {fileID: 1800142077}
   m_Layer: 3
   m_Name: Player
   m_TagString: Player
@@ -49874,6 +49877,8 @@ MonoBehaviour:
   gravityScale: 2.5
   canControl: 1
   isLaunched: 0
+  launchAirControl: 20
+  addJumpToLaunch: 0
   glowColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
   fireDuration: 0.4
   jumpable: 1
@@ -49882,9 +49887,11 @@ MonoBehaviour:
   flameSprite: {fileID: 0}
   respawnPoint: {x: 0, y: 0}
   respawnDelay: 0.5
+  respawnControlLockTime: 0.3
   jumpSound: {fileID: 8300000, guid: f711db81f9b045d44a556301295c291a, type: 3}
   deathSound: {fileID: 0}
   flameSound: {fileID: 0}
+  arrowShotSound: {fileID: 0}
   maxJumpCount: 0
   jumpCount: 0
   groundJumpSpent: 0
@@ -49895,6 +49902,13 @@ MonoBehaviour:
   swingAngle: 60
   shootForce: 20
   bowTimeout: 5
+  intervalArrow: 1
+  arrowSpawnDistance: 0.3
+  showAimGuide: 1
+  aimGuideLength: 2
+  aimGuideWidth: 0.05
+  aimGuideColor: {r: 1, g: 0.6, b: 0.2, a: 0.35}
+  aimGuideMaterial: {fileID: 0}
 --- !u!114 &1800142075
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -49923,6 +49937,26 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::PlayerStarter
   spawnX: -44.5
   spawnY: 25
+--- !u!114 &1800142077
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1800142067}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dcd4253a989a6574180c86107e63b076, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ArrowCooldownUI
+  offset: {x: 0, y: 1.5}
+  radius: 0.25
+  fillScale: 0.85
+  segments: 48
+  backgroundColor: {r: 0, g: 0, b: 0, a: 0.5}
+  fillColor: {r: 1, g: 0.55, b: 0.1, a: 0.9}
+  sortingLayerName: Player
+  sortingOrder: 100
 --- !u!1001 &1811103674
 PrefabInstance:
   m_ObjectHideFlags: 0
