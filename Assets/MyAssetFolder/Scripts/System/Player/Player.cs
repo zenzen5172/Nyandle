@@ -29,6 +29,8 @@ public class Player : MonoBehaviour
     [Header("大砲に関する行動制限")]
     public bool canControl = true;
     public bool isLaunched = false;
+    public float launchAirControl = 20f;   // 大砲で飛ばされている間、左右入力で速度を変えられる加速度（小さいほど慣性が残る）
+    public bool addJumpToLaunch = false;   // true: 発射の上向きの勢いにジャンプ力を足す / false: 勢いとジャンプ力の大きい方を使う
 
     [Header("発光・火の判定")]
     public Color glowColor = Color.yellow;
@@ -48,10 +50,17 @@ public class Player : MonoBehaviour
     public Vector2 respawnPoint;         // CheckPointLantern などから書き換えられる。初期値は開始位置
     public float respawnDelay = 0.5f;    // 死んでから復活するまでの時間
 
+    [Header("リスポーン直後の操作不能時間（秒）")]
+    public float respawnControlLockTime = 0.3f;
+    float controlLockTimer;
+    bool IsInputLocked => controlLockTimer > 0f;
+
     [Header("音声")]
     public AudioClip jumpSound;
     public AudioClip deathSound;
     public AudioClip flameSound;   // 炎を出している間ループ再生する
+    public AudioClip arrowShotSound; // 矢を撃ったときの音（未設定なら鳴らない）
+    bool jumpSoundPlayedEarly;     // FixedUpdateを待たずにUpdateで先にジャンプ音を鳴らしたか
 
     Rigidbody2D rb;
     Collider2D col;
@@ -86,13 +95,33 @@ public class Player : MonoBehaviour
     [Header("弓矢(Mキー)")]
     public GameObject bowAndArrow;      // 構えている用の弓矢オブジェクト(Playerの子オブジェクト)
     public GameObject arrowPrefab;      // 発射する矢のプレハブ
-    public Transform arrowSpawnPoint;   // 矢が発射される位置と向き
+    public Transform arrowSpawnPoint;   // 矢が発射される位置と向き（構え中は毎フレーム弓の先に合わせて動かす）
     public float swingSpeed = 5f;       // 振り子の往復スピード
     public float swingAngle = 60f;      // 左右(上下)の最大角度 (60度なら合計120度)
     public float shootForce = 20f;      // 矢を発射する力
     private bool isAiming = false;      // 弓を構えているか
     public float bowTimeout = 5f;       // 【追加】弓が強制的に消えるまでの時間（秒）
     private float aimTimer = 0f;
+    public float intervalArrow = 1f;    // 1回撃ってから次に撃てるまでの時間（秒）
+    public float arrowSpawnDistance = 0.3f; // 弓の位置から、矢を出す位置までの距離
+
+    [Header("弓矢の向きガイド（薄い矢印）")]
+    public bool showAimGuide = true;
+    public float aimGuideLength = 2f;
+    public float aimGuideWidth = 0.05f;
+    public Color aimGuideColor = new Color(1f, 0.6f, 0.2f, 0.35f);
+    public Material aimGuideMaterial;   // 未設定なら Sprites/Default を使う
+
+    float intervalArrowTimer;           // 次に撃てるまでの残り時間（0なら撃てる）
+    float currentAimAngle;              // 水平からの角度（上がプラス）
+    Vector2 bowBaseLocalPosition;       // 右向き時の弓のローカル位置
+    Vector3 bowBaseLocalScale;
+    LineRenderer aimGuide;
+
+    // 火の弓矢UI用（awaizaさんのUIから参照）
+    public float IntervalArrowRemaining => intervalArrowTimer;
+    public float IntervalArrowRatio => intervalArrow > 0f ? Mathf.Clamp01(intervalArrowTimer / intervalArrow) : 0f;
+    public bool IsAimingArrow => isAiming;
 
     // 🌟【追加】CannonFuseやCuttableRopeが参照する「燃えている状態か」の判定
     public bool IsOnFire()
@@ -112,18 +141,55 @@ public class Player : MonoBehaviour
 
         if (audioSource == null)
             audioSource = gameObject.AddComponent<AudioSource>();
+        audioSource.priority = 0;   // 効果音が他の音に押し出されないよう最優先にする
+
+        // 初回再生時の読み込み待ちで音が遅れないよう、先に読み込んでおく
+        if (jumpSound != null && jumpSound.loadState == AudioDataLoadState.Unloaded)
+            jumpSound.LoadAudioData();
 
         rb.freezeRotation = true;   // コライダーが地面との摩擦で転がるのを防ぐ
         rb.gravityScale = gravityScale;
         jumpCount = maxJumpCount;
         respawnPoint = transform.position;
         CreateFlame();
+        CreateAimGuide();
 
         // 🌟【追加】最初は弓矢を非表示にしておく
         if (bowAndArrow != null)
         {
+            bowBaseLocalPosition = bowAndArrow.transform.localPosition;
+            bowBaseLocalPosition.x = Mathf.Abs(bowBaseLocalPosition.x);
+            bowBaseLocalScale = bowAndArrow.transform.localScale;
             bowAndArrow.SetActive(false);
         }
+    }
+
+    // 構えている間だけ表示する、射出方向の薄い矢印
+    void CreateAimGuide()
+    {
+        if (!showAimGuide) return;
+
+        var guideObj = new GameObject("AimGuide");
+        guideObj.transform.SetParent(transform, false);
+
+        aimGuide = guideObj.AddComponent<LineRenderer>();
+        aimGuide.useWorldSpace = true;
+        aimGuide.positionCount = 5;   // 軸2点 + 矢じり3点
+        aimGuide.widthMultiplier = aimGuideWidth;
+        aimGuide.numCapVertices = 2;
+        aimGuide.startColor = aimGuideColor;
+        aimGuide.endColor = aimGuideColor;
+        aimGuide.sortingOrder = 50;
+
+        Material mat = aimGuideMaterial;
+        if (mat == null)
+        {
+            Shader shader = Shader.Find("Sprites/Default");
+            if (shader != null) mat = new Material(shader);
+        }
+        if (mat != null) aimGuide.sharedMaterial = mat;
+
+        aimGuide.enabled = false;
     }
 
     void CreateFlame()
@@ -178,8 +244,7 @@ public class Player : MonoBehaviour
             audioSource.PlayOneShot(deathSound);
 
         // 🌟【追加】死亡時に弓を隠す
-        isAiming = false;
-        if (bowAndArrow != null) bowAndArrow.SetActive(false);
+        CancelAiming();
 
         Invoke(nameof(Respawn), respawnDelay);
     }
@@ -195,6 +260,7 @@ public class Player : MonoBehaviour
         rb.linearVelocity = Vector2.zero;
 
         jumpBuffer = 0f;
+        jumpSoundPlayedEarly = false;
         coyoteTimer = 0f;
         isRising = false;
         canBoost = false;
@@ -205,13 +271,16 @@ public class Player : MonoBehaviour
         canControl = true;
         isLaunched = false;
 
+        // リスポーン直後は一瞬だけ操作を受け付けない
+        controlLockTimer = respawnControlLockTime;
+
         spriteRenderer.enabled = true;
         rb.bodyType = RigidbodyType2D.Dynamic;
         isDead = false;
 
         // 🌟【追加】リスポーン時に弓をリセット
-        isAiming = false;
-        if (bowAndArrow != null) bowAndArrow.SetActive(false);
+        CancelAiming();
+        intervalArrowTimer = 0f;
 
         OnRespawn?.Invoke(); // 既存のイベント呼び出しがあれば
     }
@@ -237,11 +306,24 @@ public class Player : MonoBehaviour
         var kb = Keyboard.current;
         if (kb == null || isDead) return;
 
+        if (controlLockTimer > 0f) controlLockTimer -= Time.deltaTime;
+        if (intervalArrowTimer > 0f) intervalArrowTimer -= Time.deltaTime;
+        bool inputLocked = IsInputLocked;
+
         // canControlがtrueの時、または空中・ジャンプ可能な時に入力を受付
-        if (canControl || isGrounded || jumpable || jumpCount > 0)
+        if (!inputLocked && (canControl || isGrounded || jumpable || jumpCount > 0))
         {
             if (kb.upArrowKey.wasPressedThisFrame || kb.wKey.wasPressedThisFrame || kb.spaceKey.wasPressedThisFrame)
+            {
                 jumpBuffer = jumpBufferTime;
+
+                // ジャンプ音はFixedUpdate(物理更新)を待たず、押したフレームですぐ鳴らす
+                if (CanStartJump() && !jumpSoundPlayedEarly)
+                {
+                    PlayJumpSound();
+                    jumpSoundPlayedEarly = true;
+                }
+            }
         }
 
         // 点火タイマーとカラー更新
@@ -256,86 +338,197 @@ public class Player : MonoBehaviour
         }
 
         // S / 下キーを押している間、頭上に炎を出して当たり判定を有効化
-        bool flameHeld = kb.sKey.isPressed || kb.downArrowKey.isPressed;
+        bool flameHeld = !inputLocked && (kb.sKey.isPressed || kb.downArrowKey.isPressed);
         if (flame.activeSelf != flameHeld)
             flame.SetActive(flameHeld);
 
         // 🌟【追加】Mキーでの弓矢の操作 (操作可能な時のみ)
-        if (canControl)
-        {
-            // Mキーを押した瞬間：構えてタイマーをリセット
-            if (kb.mKey.wasPressedThisFrame)
-            {
-                isAiming = true;
-                aimTimer = 0f; // タイマーを0に戻す
-                if (bowAndArrow != null) bowAndArrow.SetActive(true);
-            }
-
-            // Mキーを押し続けている間：往復回転 ＋ タイムアウト処理
-            if (kb.mKey.isPressed && isAiming)
-            {
-                aimTimer += Time.deltaTime; // 経過時間を足していく
-
-                if (aimTimer >= bowTimeout)
-                {
-                    // 5秒経過したら強制的に構えを解除して消す（発射はしない）
-                    isAiming = false;
-                    if (bowAndArrow != null) bowAndArrow.SetActive(false);
-                }
-                else
-                {
-                    // まだ時間内なら弓を上下に動かす
-                    float sineWave = Mathf.Sin(Time.time * swingSpeed);
-                    float currentAngle = sineWave * swingAngle;
-
-                    // 左を向いている時はベースの角度を180度にする
-                    float baseAngle = spriteRenderer.flipX ? 180f : 0f;
-
-                    if (bowAndArrow != null)
-                    {
-                        bowAndArrow.transform.localRotation = Quaternion.Euler(0, 0, baseAngle + currentAngle);
-                    }
-                }
-            }
-
-            // Mキーを離した瞬間：発射（※時間切れでisAimingがfalseになっていれば発射されません）
-            if (kb.mKey.wasReleasedThisFrame && isAiming)
-            {
-                isAiming = false;
-                if (bowAndArrow != null) bowAndArrow.SetActive(false);
-                ShootArrow();
-            }
-        }
-
-        if (fireTimer > 0)
-        {
-            fireTimer -= Time.deltaTime;
-            spriteRenderer.color = Color.orange;
-        }
-        else
-        {
-            spriteRenderer.color = (jumpable || isGrounded) ? glowColor : Color.gray;
-        }
-
-        if (flame.activeSelf != flameHeld)
-            flame.SetActive(flameHeld);
+        if (canControl && !inputLocked)
+            HandleBowInput(kb);
+        else if (isAiming)
+            CancelAiming();
     }
-        // 🌟【追加】矢を発射する処理
-        void ShootArrow()
+
+    bool CanStartJump() => isGrounded || coyoteTimer > 0f || jumpCount > 0 || jumpable;
+
+    void PlayJumpSound()
+    {
+        if (jumpSound != null) audioSource.PlayOneShot(jumpSound);
+    }
+
+    // ===== 火の弓矢 =====
+    // M押す → chargeArrow / M長押し → targetArrow（射出方向が上下に往復） / M離す → shotArrow で発射
+    void HandleBowInput(Keyboard kb)
+    {
+        // Mキーを押した瞬間：構えてタイマーをリセット（インターバル中は構えられない）
+        if (kb.mKey.wasPressedThisFrame && !isAiming && intervalArrowTimer <= 0f)
         {
-            if (arrowPrefab == null || arrowSpawnPoint == null) return;
-
-            // 矢を生成
-            GameObject firedArrow = Instantiate(arrowPrefab, arrowSpawnPoint.position, arrowSpawnPoint.rotation);
-
-            // 矢のRigidbody2Dを取得して前方に飛ばす
-            Rigidbody2D rbArrow = firedArrow.GetComponent<Rigidbody2D>();
-            if (rbArrow != null)
-            {
-                // 2Dの場合、transform.right がローカルの正面（X軸方向）になる
-                rbArrow.linearVelocity = arrowSpawnPoint.right * shootForce;
-            }
+            isAiming = true;
+            aimTimer = 0f;
+            currentAimAngle = 0f;
+            if (bowAndArrow != null) bowAndArrow.SetActive(true);
+            if (aimGuide != null) aimGuide.enabled = true;
+            SetAnimTrigger("chargeArrow");
+            UpdateBowPose();
+            return;
         }
+
+        if (!isAiming) return;
+
+        // Mキーを押し続けている間：往復回転 ＋ タイムアウト処理
+        if (kb.mKey.isPressed)
+        {
+            aimTimer += Time.deltaTime;
+
+            if (aimTimer >= bowTimeout)
+            {
+                // 時間切れなら構えを解除して消す（発射はしない）
+                CancelAiming();
+                return;
+            }
+
+            SetAnimBool("targetArrow", true);
+
+            // 水平(0度)から始まって、上下に弧を描くように往復する
+            currentAimAngle = Mathf.Sin(aimTimer * swingSpeed) * swingAngle;
+            UpdateBowPose();
+        }
+
+        // Mキーを離した瞬間：発射
+        if (kb.mKey.wasReleasedThisFrame || !kb.mKey.isPressed)
+        {
+            UpdateBowPose();
+            Vector2 dir = AimDirection();
+            Vector2 spawnPos = ArrowSpawnPosition(dir);
+
+            HideBow();
+            SetAnimBool("targetArrow", false);
+            SetAnimTrigger("shotArrow");
+
+            ShootArrow(spawnPos, dir);
+            intervalArrowTimer = intervalArrow;
+        }
+    }
+
+    float FacingSign => (spriteRenderer != null && spriteRenderer.flipX) ? -1f : 1f;
+
+    // 実際に矢が飛ぶ方向（ワールド座標）
+    Vector2 AimDirection()
+    {
+        float rad = currentAimAngle * Mathf.Deg2Rad;
+        return new Vector2(Mathf.Cos(rad) * FacingSign, Mathf.Sin(rad));
+    }
+
+    Vector2 BowWorldPosition()
+    {
+        Vector2 local = new Vector2(bowBaseLocalPosition.x * FacingSign, bowBaseLocalPosition.y);
+        return transform.TransformPoint(local);
+    }
+
+    Vector2 ArrowSpawnPosition(Vector2 dir) => BowWorldPosition() + dir * arrowSpawnDistance;
+
+    // 弓・発射位置・ガイドの矢印を、今の向きと角度に合わせる
+    void UpdateBowPose()
+    {
+        Vector2 dir = AimDirection();
+        float worldAngle = Mathf.Atan2(dir.y, dir.x) * Mathf.Rad2Deg;
+        float facing = FacingSign;
+
+        if (bowAndArrow != null)
+        {
+            Transform bow = bowAndArrow.transform;
+            bow.localPosition = new Vector3(bowBaseLocalPosition.x * facing, bowBaseLocalPosition.y, bow.localPosition.z);
+            bow.rotation = Quaternion.Euler(0f, 0f, worldAngle);
+            // 左向きのときに弓が上下逆さまにならないようにする
+            bow.localScale = new Vector3(bowBaseLocalScale.x, Mathf.Abs(bowBaseLocalScale.y) * facing, bowBaseLocalScale.z);
+        }
+
+        Vector2 spawnPos = ArrowSpawnPosition(dir);
+        if (arrowSpawnPoint != null)
+        {
+            arrowSpawnPoint.position = new Vector3(spawnPos.x, spawnPos.y, arrowSpawnPoint.position.z);
+            arrowSpawnPoint.rotation = Quaternion.Euler(0f, 0f, worldAngle);
+        }
+
+        if (aimGuide != null)
+        {
+            Vector2 tip = spawnPos + dir * aimGuideLength;
+            float head = Mathf.Min(0.3f, aimGuideLength * 0.3f);
+            Vector2 back = tip - dir * head;
+            Vector2 side = new Vector2(-dir.y, dir.x) * head * 0.6f;
+            aimGuide.SetPosition(0, spawnPos);
+            aimGuide.SetPosition(1, tip);
+            aimGuide.SetPosition(2, back + side);
+            aimGuide.SetPosition(3, tip);
+            aimGuide.SetPosition(4, back - side);
+        }
+    }
+
+    void HideBow()
+    {
+        isAiming = false;
+        if (bowAndArrow != null) bowAndArrow.SetActive(false);
+        if (aimGuide != null) aimGuide.enabled = false;
+    }
+
+    // 撃たずに構えをやめる（死亡・リスポーン・大砲に入ったときなど）
+    void CancelAiming()
+    {
+        if (isAiming) SetAnimBool("targetArrow", false);
+        HideBow();
+        aimTimer = 0f;
+    }
+
+    // 🌟【追加】矢を発射する処理
+    void ShootArrow(Vector2 spawnPos, Vector2 dir)
+    {
+        if (arrowPrefab == null) return;
+
+        float worldAngle = Mathf.Atan2(dir.y, dir.x) * Mathf.Rad2Deg;
+        GameObject firedArrow = Instantiate(arrowPrefab, spawnPos, Quaternion.Euler(0f, 0f, worldAngle));
+
+        // 火の矢の当たり判定（松明・コウモリ・導火線・綱）。プレハブに付いていなければ自動で付ける
+        FireArrow fireArrow = firedArrow.GetComponent<FireArrow>();
+        if (fireArrow == null) fireArrow = firedArrow.AddComponent<FireArrow>();
+        fireArrow.SetOwner(gameObject);
+
+        // 自分の矢がプレイヤー自身に当たらないようにする
+        foreach (var arrowCol in firedArrow.GetComponentsInChildren<Collider2D>())
+        {
+            foreach (var myCol in GetComponentsInChildren<Collider2D>())
+                Physics2D.IgnoreCollision(arrowCol, myCol);
+        }
+
+        Rigidbody2D rbArrow = firedArrow.GetComponent<Rigidbody2D>();
+        if (rbArrow != null)
+        {
+            rbArrow.linearVelocity = dir * shootForce;
+        }
+
+        if (arrowShotSound != null) audioSource.PlayOneShot(arrowShotSound);
+    }
+
+    // Animatorにそのパラメータがあるときだけ設定する（アニメーション未作成でも警告が出ないように）
+    bool HasAnimParam(string paramName, AnimatorControllerParameterType type)
+    {
+        if (animator == null || animator.runtimeAnimatorController == null) return false;
+        foreach (var p in animator.parameters)
+        {
+            if (p.type == type && p.name == paramName) return true;
+        }
+        return false;
+    }
+
+    void SetAnimTrigger(string paramName)
+    {
+        if (HasAnimParam(paramName, AnimatorControllerParameterType.Trigger)) animator.SetTrigger(paramName);
+    }
+
+    void SetAnimBool(string paramName, bool value)
+    {
+        if (HasAnimParam(paramName, AnimatorControllerParameterType.Bool) && animator.GetBool(paramName) != value)
+            animator.SetBool(paramName, value);
+    }
 
     void FixedUpdate()
     {
@@ -365,13 +558,14 @@ public class Player : MonoBehaviour
             }
         }
 
-        // 大砲の中に入っている時や硬直中(canControl == false)は移動入力をパスする
-        if (canControl)
+        // 大砲の中に入っている時や硬直中(canControl == false)、リスポーン直後は移動入力をパスする
+        if (canControl && !IsInputLocked)
         {
             HorizontalMove();
         }
 
         Jump();
+        if (jumpBuffer <= 0f) jumpSoundPlayedEarly = false;   // 先に鳴らしたがジャンプしなかった場合のリセット
         KillUnwantedLift();
         UpdateAppearance();
     }
@@ -428,7 +622,14 @@ public class Player : MonoBehaviour
         }
 
         // 3. 移動速度の適用
-        rb.linearVelocity = new Vector2(moveInput * moveSpeed, rb.linearVelocity.y);
+        float targetVx = moveInput * moveSpeed;
+        float vx = targetVx;
+        if (isLaunched && !isGrounded)
+        {
+            // 大砲で飛ばされている間は、発射の勢い（慣性）を残したまま少しずつ入力方向に寄せる
+            vx = Mathf.MoveTowards(rb.linearVelocity.x, targetVx, launchAirControl * Time.fixedDeltaTime);
+        }
+        rb.linearVelocity = new Vector2(vx, rb.linearVelocity.y);
 
         // 4. スプライト反転用に lastX を更新
         if (moveInput != 0f)
@@ -440,13 +641,23 @@ public class Player : MonoBehaviour
     void Jump()
     {
         var kb = Keyboard.current;
-        bool held = kb != null && (kb.upArrowKey.isPressed || kb.wKey.isPressed || kb.spaceKey.isPressed);
+        bool held = kb != null && !IsInputLocked && (kb.upArrowKey.isPressed || kb.wKey.isPressed || kb.spaceKey.isPressed);
 
-        if (jumpBuffer > 0f && (isGrounded || coyoteTimer > 0f || jumpCount > 0 || jumpable))
+        if (jumpBuffer > 0f && CanStartJump())
         {
-            if (jumpSound != null) audioSource.PlayOneShot(jumpSound);
+            // Updateで先に鳴らしていなければここで鳴らす（着地直前の先行入力など）
+            if (!jumpSoundPlayedEarly) PlayJumpSound();
+            jumpSoundPlayedEarly = false;
 
-            rb.linearVelocity = new Vector2(rb.linearVelocity.x, PowerForHeight(HeightForBlocks(minJumpBlocks)));
+            float jumpPower = PowerForHeight(HeightForBlocks(minJumpBlocks));
+            float vy = jumpPower;
+            if (isLaunched)
+            {
+                // 大砲の強発射中は、発射の勢いを消さずにジャンプする
+                float launchVy = Mathf.Max(rb.linearVelocity.y, 0f);
+                vy = addJumpToLaunch ? launchVy + jumpPower : Mathf.Max(launchVy, jumpPower);
+            }
+            rb.linearVelocity = new Vector2(rb.linearVelocity.x, vy);
             jumpStartY = rb.position.y;
             jumpTime = 0f;
             isRising = true;
@@ -489,7 +700,11 @@ public class Player : MonoBehaviour
                 float targetHeight = HeightForBlocks(Mathf.Lerp(minJumpBlocks, maxJumpBlocks, t));
                 float remaining = targetHeight - (rb.position.y - jumpStartY);
                 if (remaining > 0f)
-                    rb.linearVelocity = new Vector2(rb.linearVelocity.x, PowerForHeight(remaining));
+                {
+                    float boosted = PowerForHeight(remaining);
+                    if (isLaunched) boosted = Mathf.Max(boosted, rb.linearVelocity.y);   // 発射の勢いを弱めない
+                    rb.linearVelocity = new Vector2(rb.linearVelocity.x, boosted);
+                }
             }
         }
     }

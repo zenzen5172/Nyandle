@@ -1,7 +1,7 @@
 using UnityEngine;
 
 [RequireComponent(typeof(LineRenderer))]
-public class CannonFuse : MonoBehaviour
+public class CannonFuse : MonoBehaviour, IIgnitable
 {
     [Header("導火線の通過ポイント（曲がり角に配置）")]
     [SerializeField] Transform[] waypoints;
@@ -125,13 +125,24 @@ public class CannonFuse : MonoBehaviour
 
             if (player != null && player.IsOnFire())
             {
-                isLit = true;
-                currentBurnTimer = 0f;
-
-                isCompleted = false;
-                HideTrigger();
+                Light();
             }
         }
+    }
+
+    // 火の矢が当たったときも点火する
+    public void Ignite(GameObject source)
+    {
+        if (!isLit) Light();
+    }
+
+    private void Light()
+    {
+        isLit = true;
+        currentBurnTimer = 0f;
+
+        isCompleted = false;
+        HideTrigger();
     }
 
     private void HideTrigger()

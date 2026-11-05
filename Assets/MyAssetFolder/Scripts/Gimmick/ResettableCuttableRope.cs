@@ -3,7 +3,7 @@
 // CuttableRopeと同じ切断処理だが、プレイヤーがリスポーンすると
 // 綱・箱とも切る前の状態に自動的に戻る版。
 // ずっと切れたままにしたい綱には CuttableRope を使ってください。
-public class ResettableCuttableRope : MonoBehaviour
+public class ResettableCuttableRope : MonoBehaviour, IIgnitable
 {
     [Header("箱を吊るしているジョイント（箱についているHingeJoint2Dなど）")]
     [SerializeField] private Joint2D boxJoint;
@@ -47,6 +47,12 @@ public class ResettableCuttableRope : MonoBehaviour
                 Cut();
             }
         }
+    }
+
+    // 火の矢が当たったときも切断する
+    public void Ignite(GameObject source)
+    {
+        if (!isCut) Cut();
     }
 
     private void Cut()

@@ -94,13 +94,13 @@ public class Cannon : MonoBehaviour
     }
 
     // 🌟【追加】指定した秒数だけ待ってから、プレイヤーの操作制限を解除する処理
+    // isLaunched は着地するまで Player 側で true のままにして、発射の慣性を残す
     private IEnumerator EnablePlayerControl(Player player, float delay)
     {
         yield return new WaitForSeconds(delay);
-        if (player != null)
+        if (player != null && !player.IsDead)
         {
             player.canControl = true;
-            player.isLaunched = false;
         }
     }
 }

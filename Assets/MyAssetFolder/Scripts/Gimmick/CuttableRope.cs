@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class CuttableRope : MonoBehaviour
+public class CuttableRope : MonoBehaviour, IIgnitable
 {
     [Header("箱を吊るしているジョイント（箱についているHingeJoint2Dなど）")]
     [SerializeField] private Joint2D boxJoint;
@@ -18,6 +18,12 @@ public class CuttableRope : MonoBehaviour
                 Cut();
             }
         }
+    }
+
+    // 火の矢が当たったときも切断する
+    public void Ignite(GameObject source)
+    {
+        if (gameObject.activeInHierarchy) Cut();
     }
 
     private void Cut()

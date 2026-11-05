@@ -1,7 +1,7 @@
 using System.Collections;
 using UnityEngine;
 
-public class BatEnemy : MonoBehaviour
+public class BatEnemy : MonoBehaviour, IIgnitable
 {
     [Header("ターゲット（プレイヤー）")]
     [SerializeField] Transform player;
@@ -29,9 +29,14 @@ public class BatEnemy : MonoBehaviour
     [SerializeField] float closeDamageMultiplier = 3f; // Playerに密着したときの最大ダメージ倍率（近いほどHitTimeが速く減る）
     [SerializeField] float hurtGlowIntensity = 6f; // 黒いスプライトでも赤く光らせるためのオーバーブライト値（HDR）
 
+    [Header("火の矢が当たったときのダメージ（HitTimeに何秒ぶん加算するか）")]
+    [SerializeField] float arrowDamage = 3f;
+    [SerializeField] float arrowNoRecoverTime = 2f; // 矢が当たってから回復しない時間（光の外から撃っても連続ヒットでダメージが溜まるように）
+
     private SpriteRenderer spriteRenderer;
     private Color originalColor;
     [SerializeField ]private float hitTimer = 0f; // 0〜hitTimeで蓄積し、hitTimeに達すると死ぬ
+    private float arrowNoRecoverTimer = 0f;
 
     private Vector2 startPos;
     private Vector2 targetPos;
@@ -91,6 +96,8 @@ public class BatEnemy : MonoBehaviour
         float distance = Vector2.Distance(transform.position, player.position);
         bool isLit = distance <= lightRadius;
 
+        if (arrowNoRecoverTimer > 0f) arrowNoRecoverTimer -= Time.deltaTime;
+
         if (isLit)
         {
             // Playerに近いほどHitTimeが速く減る（＝ダメージが速く蓄積する）
@@ -98,7 +105,7 @@ public class BatEnemy : MonoBehaviour
             float damageMultiplier = Mathf.Lerp(1f, closeDamageMultiplier, closeness);
             hitTimer += Time.deltaTime * damageMultiplier;
         }
-        else
+        else if (arrowNoRecoverTimer <= 0f)
         {
             hitTimer -= Time.deltaTime * recoverRate;
         }
@@ -120,6 +127,17 @@ public class BatEnemy : MonoBehaviour
 
         Debug.Log($"BatEnemy hitTimer={hitTimer:F2}/{hitTime} isLit={isLit} distance={distance:F2}");
 
+        if (hitTimer >= hitTime)
+        {
+            Destroy(gameObject);
+        }
+    }
+
+    // 火の矢が当たったときのダメージ（光と同じく hitTimer に蓄積し、HitTime に達したら死ぬ）
+    public void Ignite(GameObject source)
+    {
+        hitTimer = Mathf.Min(hitTimer + arrowDamage, hitTime);
+        arrowNoRecoverTimer = arrowNoRecoverTime;
         if (hitTimer >= hitTime)
         {
             Destroy(gameObject);

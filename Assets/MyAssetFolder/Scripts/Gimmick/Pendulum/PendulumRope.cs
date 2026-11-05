@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class PendulumRope : MonoBehaviour
+public class PendulumRope : MonoBehaviour, IIgnitable
 {
     [SerializeField] private Transform pivot;
     [SerializeField] private Transform woodBox;
@@ -75,6 +75,12 @@ public class PendulumRope : MonoBehaviour
     private void OnDestroy()
     {
         Player.OnRespawn -= ResetRope;
+    }
+
+    // 火の矢が当たったときも切断する
+    public void Ignite(GameObject source)
+    {
+        if (!isCut) Cut();
     }
 
     private void Cut()
