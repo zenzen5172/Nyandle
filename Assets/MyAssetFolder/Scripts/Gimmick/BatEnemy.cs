@@ -91,18 +91,33 @@ public class BatEnemy : MonoBehaviour, IIgnitable
     // 当たっていない間は徐々に回復する
     private void UpdateLightDamage()
     {
-        if (player == null) return;
+        bool isLit = false;
+        float damageMultiplier = 0f;
 
-        float distance = Vector2.Distance(transform.position, player.position);
-        bool isLit = distance <= lightRadius;
+        if (player != null)
+        {
+            float distance = Vector2.Distance(transform.position, player.position);
+            if (distance <= lightRadius)
+            {
+                // Playerに近いほどHitTimeが速く減る（＝ダメージが速く蓄積する）
+                float closeness = 1f - Mathf.Clamp01(distance / lightRadius);
+                damageMultiplier += Mathf.Lerp(1f, closeDamageMultiplier, closeness);
+                isLit = true;
+            }
+        }
+
+        // 火が付いた松明の光（各松明の batDamageRadius 以内）でもダメージ
+        float torchMultiplier = GetTorchDamageMultiplier();
+        if (torchMultiplier > 0f)
+        {
+            damageMultiplier += torchMultiplier;
+            isLit = true;
+        }
 
         if (arrowNoRecoverTimer > 0f) arrowNoRecoverTimer -= Time.deltaTime;
 
         if (isLit)
         {
-            // Playerに近いほどHitTimeが速く減る（＝ダメージが速く蓄積する）
-            float closeness = 1f - Mathf.Clamp01(distance / lightRadius);
-            float damageMultiplier = Mathf.Lerp(1f, closeDamageMultiplier, closeness);
             hitTimer += Time.deltaTime * damageMultiplier;
         }
         else if (arrowNoRecoverTimer <= 0f)
@@ -120,17 +135,29 @@ public class BatEnemy : MonoBehaviour, IIgnitable
             Color hdrRed = new Color(hurtGlowIntensity, 0f, 0f, 1f);
             spriteRenderer.color = Color.Lerp(originalColor, hdrRed, t);
         }
-        else
-        {
-            Debug.LogWarning("BatEnemy: spriteRenderer is null, color will not update");
-        }
-
-        Debug.Log($"BatEnemy hitTimer={hitTimer:F2}/{hitTime} isLit={isLit} distance={distance:F2}");
 
         if (hitTimer >= hitTime)
         {
             Destroy(gameObject);
         }
+    }
+
+    // 範囲内にある、火が付いた松明すべてのダメージ倍率の合計（Playerの光と同じく、松明に近いほど強い）
+    private float GetTorchDamageMultiplier()
+    {
+        float total = 0f;
+        Vector2 pos = transform.position;
+        foreach (IgnoreFire torch in IgnoreFire.All)
+        {
+            if (!torch.damageBats || !torch.IsLit || torch.batDamageRadius <= 0f) continue;
+
+            float d = Vector2.Distance(pos, torch.LightCenter);
+            if (d > torch.batDamageRadius) continue;
+
+            float closeness = 1f - Mathf.Clamp01(d / torch.batDamageRadius);
+            total += Mathf.Lerp(1f, closeDamageMultiplier, closeness) * torch.batDamageMultiplier;
+        }
+        return total;
     }
 
     // 火の矢が当たったときのダメージ（光と同じく hitTimer に蓄積し、HitTime に達したら死ぬ）
