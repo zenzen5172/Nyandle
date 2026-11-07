@@ -5,10 +5,10 @@ public class IgnoreFire : MonoBehaviour, IIgnitable
 {
     public GameObject fire;
 
-    [Header("松明の光でコウモリにダメージ")]
+    [Header("コウモリが火に突っ込むと「熱っ！」と怯む")]
     public bool damageBats = true;
-    public float batDamageRadius = 3f;       // この範囲内のコウモリにダメージ（Sceneビューで選択すると範囲が表示される）
-    public float batDamageMultiplier = 1f;   // ダメージの強さ（1でPlayerの光の外縁と同じ速さ）
+    public float batDamageRadius = 3f;       // この範囲に入ったコウモリが怯む（Sceneビューで選択するとオレンジの円で表示）
+    public float batDamageMultiplier = 1f;   // じわじわダメージの強さ（BatEnemyの torchContinuousDamage がONのときだけ使う）
 
     [Header("コウモリが怖がって避ける（たき火など大きな火に）")]
     public bool scaresBats = true;
