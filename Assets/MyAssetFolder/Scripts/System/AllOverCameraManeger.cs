@@ -17,7 +17,15 @@ public class AllOverCameraManeger : MonoBehaviour
     [SerializeField] private float overviewSize = 20f;
     [SerializeField] private float zoomDuration = 0.4f; // 引き／戻りにかかる時間（秒）
 
-    [Header("俯瞰中の視点移動速度")]
+    [Header("俯瞰中のマウスホイールでの拡大縮小")]
+    [SerializeField] private bool scrollZoom = true;
+    [SerializeField] private float minOverviewSize = 8f;   // 一番寄ったときの大きさ
+    [SerializeField] private float maxOverviewSize = 40f;  // 一番引いたときの大きさ
+    [SerializeField] private float scrollZoomStep = 0.15f; // ホイール1目盛りで変わる割合
+    [SerializeField] private float scrollZoomSmoothness = 12f; // 大きいほど素早く追従
+    [SerializeField] private bool rememberZoom = true; // 次にZで開いたとき、前回の拡大率から始める
+
+    [Header("俯瞰中の視点移動速度（引いているほど速くなる）")]
     [SerializeField] private float panSpeed = 25f;
 
     [Header("俯瞰中のゲーム進行を止める")]
@@ -35,6 +43,7 @@ public class AllOverCameraManeger : MonoBehaviour
     private float zoomToSize;
     private bool overviewOn; // 俯瞰中（視点移動できる状態）
     private bool returning;  // 元のカメラに戻るアニメーション中
+    private float overviewTargetSize; // ホイールで決めた俯瞰の大きさ
     private float savedTimeScale = 1f;
 
     void Start()
@@ -83,6 +92,25 @@ public class AllOverCameraManeger : MonoBehaviour
 
         if (!overviewOn) return;
 
+        // マウスホイールで拡大縮小（上で寄る、下で引く）
+        var mouse = Mouse.current;
+        if (scrollZoom && mouse != null)
+        {
+            float scroll = mouse.scroll.ReadValue().y;
+            if (scroll != 0f)
+            {
+                overviewTargetSize *= 1f - Mathf.Sign(scroll) * scrollZoomStep;
+                overviewTargetSize = Mathf.Clamp(overviewTargetSize, minOverviewSize, maxOverviewSize);
+                if (zoomTimer < zoomDuration) zoomToSize = overviewTargetSize; // 引きのアニメーション中なら行き先を変える
+            }
+
+            if (zoomTimer >= zoomDuration)
+            {
+                float k = 1f - Mathf.Exp(-scrollZoomSmoothness * dt);
+                targetCamera.orthographicSize = Mathf.Lerp(targetCamera.orthographicSize, overviewTargetSize, k);
+            }
+        }
+
         // 十字キー／WASDで視点移動
         Vector2 move = Vector2.zero;
         if (kb.leftArrowKey.isPressed || kb.aKey.isPressed) move.x -= 1f;
@@ -92,7 +120,8 @@ public class AllOverCameraManeger : MonoBehaviour
 
         if (move != Vector2.zero)
         {
-            Vector3 pos = targetCamera.transform.position + (Vector3)(move.normalized * panSpeed * dt);
+            float speed = panSpeed * (overviewSize > 0f ? targetCamera.orthographicSize / overviewSize : 1f);
+            Vector3 pos = targetCamera.transform.position + (Vector3)(move.normalized * speed * dt);
             if (useBounds)
             {
                 pos.x = Mathf.Clamp(pos.x, boundsMin.x, boundsMax.x);
@@ -112,13 +141,17 @@ public class AllOverCameraManeger : MonoBehaviour
         // 部屋単位の追従を止める
         if (stageCamera != null) stageCamera.enabled = false;
 
+        // 前回ホイールで決めた大きさを覚えておく（初回 or rememberZoomがOFFなら既定の大きさ）
+        if (!rememberZoom || overviewTargetSize <= 0f) overviewTargetSize = overviewSize;
+        overviewTargetSize = Mathf.Clamp(overviewTargetSize, minOverviewSize, maxOverviewSize);
+
         if (pauseWhileOverview)
         {
             savedTimeScale = Time.timeScale;
             Time.timeScale = 0f;
         }
 
-        StartZoom(overviewSize);
+        StartZoom(overviewTargetSize);
     }
 
     private void EndOverview(bool instant)
