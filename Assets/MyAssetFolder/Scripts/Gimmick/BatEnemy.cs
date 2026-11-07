@@ -46,13 +46,8 @@ public class BatEnemy : MonoBehaviour, IIgnitable
     [SerializeField] float playerFireFearRadius = 3f;
 
     [Header("火に突っ込んだときの怯み（熱っ！）（IgnoreFireの batDamageRadius に入ったとき）")]
-    [SerializeField] bool flinchFromFire = true;
     [SerializeField] float fireHitDamage = 2f;      // 怯んだときに一度だけ受けるダメージ（HitTimeに加算）
-    [SerializeField] float flinchDuration = 0.4f;   // ノックバックしている時間（秒）
-    [SerializeField] float flinchKnockback = 6f;    // 火と反対方向へ弾かれる横の速さ
-    [SerializeField] float flinchHop = 6f;          // 上に跳ねる速さ
-    [SerializeField] float flinchGravity = 30f;     // ノックバック中の重力（跳ねた後に落ちる）
-    [SerializeField] float flashDuration = 0.4f;    // 赤くなっている時間（秒）
+    [SerializeField] float flinchKnockback = 9f;    // 火と反対方向へ弾かれる速さ
     [SerializeField] bool torchContinuousDamage = false; // 以前の「火の近くにいる間じわじわダメージ」も使うか
 
     private SpriteRenderer spriteRenderer;
@@ -62,9 +57,11 @@ public class BatEnemy : MonoBehaviour, IIgnitable
     private float arrowNoRecoverTimer = 0f;
     private float flashTimer = 0f;        // 怯んだ瞬間に真っ赤に光らせる時間
     private float flinchImmuneTimer = 0f; // 怯んだ直後は連続で怯まない
+    private const float FlashTime = 0.3f;       // 怯んだときに赤くなる時間（秒）
+    private const float FlinchImmuneTime = 1f;  // 怯んだ後、再び怯むまでの時間（秒）
 
     // コウモリの現在の状態
-    private enum State { Perched, Diving, Returning, Knockback }
+    private enum State { Perched, Diving, Returning }
     private State currentState = State.Perched;
 
     private Vector2 position;       // 現在位置
@@ -119,8 +116,7 @@ public class BatEnemy : MonoBehaviour, IIgnitable
 
         // 火に突っ込んだら「熱っ！」と怯む（いつでも）
         if (flinchImmuneTimer > 0f) flinchImmuneTimer -= dt;
-        if (flinchFromFire && currentState != State.Knockback && flinchImmuneTimer <= 0f
-            && TryGetTouchingFire(out Vector2 fireCenter))
+        if (flinchImmuneTimer <= 0f && TryGetTouchingFire(out Vector2 fireCenter))
         {
             if (!StartFlinch(fireCenter)) return; // ダメージで死んだ
         }
@@ -130,7 +126,6 @@ public class BatEnemy : MonoBehaviour, IIgnitable
             case State.Perched:   UpdatePerched(dt); break;
             case State.Diving:    UpdateDiving(dt); break;
             case State.Returning: UpdateReturning(dt); break;
-            case State.Knockback: UpdateKnockback(dt); break;
         }
 
         transform.position = new Vector3(position.x, position.y, transform.position.z);
@@ -209,19 +204,6 @@ public class BatEnemy : MonoBehaviour, IIgnitable
         }
     }
 
-    private void UpdateKnockback(float dt)
-    {
-        velocity.y -= flinchGravity * dt;                   // 重力で落ちる
-        velocity.x = Mathf.Lerp(velocity.x, 0f, 6f * dt);   // 横の勢いはだんだん弱まる
-        position += velocity * dt;
-
-        if (stateTimer >= flinchDuration)
-        {
-            // 体勢を立て直して、火から離れた天井へ逃げる
-            FlyHome(PickSafeCeilingPoint(excludeCurrent: false));
-        }
-    }
-
     // 目標の速度に向けて、最大 accel の強さで今の速度を変える
     private void Steer(Vector2 desiredVelocity, float accel, float dt)
     {
@@ -252,26 +234,23 @@ public class BatEnemy : MonoBehaviour, IIgnitable
 
     // ===== 火 =====
 
-    // 「熱っ！」：一度だけダメージを受け、赤くなって火と反対側へ跳ねるようにノックバック（マイクラ風）、その後安全な天井へ逃げる
-    // 死んだら false を返す
+    // 「熱っ！」：ダメージを受けて赤くなり、火と反対方向へ弾かれる（速度を変えるだけ）。
+    // そのまま安全な天井へ戻るので、ステアリングで自然に向きを立て直す。死んだら false を返す
     private bool StartFlinch(Vector2 fireCenter)
     {
-        flinchImmuneTimer = flinchDuration + 1f; // 逃げ始めるまでは再度怯まない
-
+        flinchImmuneTimer = FlinchImmuneTime;
+        flashTimer = FlashTime;
         hitTimer = Mathf.Min(hitTimer + fireHitDamage, hitTime);
         arrowNoRecoverTimer = arrowNoRecoverTime;
-        flashTimer = flashDuration;
         if (hitTimer >= hitTime)
         {
             Destroy(gameObject);
             return false;
         }
 
-        // 火と反対側（横方向）へ弾かれつつ、上にポンと跳ねる
-        float side = Mathf.Sign(position.x - fireCenter.x);
-        if (side == 0f) side = 1f;
-        velocity = new Vector2(side * flinchKnockback, flinchHop);
-        SetState(State.Knockback);
+        Vector2 away = position - fireCenter;
+        velocity = (away.sqrMagnitude > 0f ? away.normalized : Vector2.up) * flinchKnockback;
+        FlyHome(PickSafeCeilingPoint(excludeCurrent: false));
         return true;
     }
 
@@ -403,7 +382,7 @@ public class BatEnemy : MonoBehaviour, IIgnitable
         {
             // 通常のColor.Lerpだと黒に近いスプライトを赤くできないため、
             // オーバーブライト（1を超える値）の赤をHDRで加算的に乗算して光らせる
-            // ダメージを受けたら flashDuration の間だけ真っ赤になる（マイクラ風）
+            // ダメージを受けたら FlashTime の間だけ真っ赤になる（マイクラ風）
             float t = flashTimer > 0f ? 1f : hitTimer / hitTime;
             Color hdrRed = new Color(hurtGlowIntensity, 0f, 0f, 1f);
             spriteRenderer.color = Color.Lerp(originalColor, hdrRed, t);
