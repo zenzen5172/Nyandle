@@ -33,7 +33,14 @@ public class BatEnemy : MonoBehaviour, IIgnitable
     [SerializeField] float arrowDamage = 3f;
     [SerializeField] float arrowNoRecoverTime = 2f; // 矢が当たってから回復しない時間（光の外から撃っても連続ヒットでダメージが溜まるように）
 
+    [Header("火を怖がる（IgnoreFireの scaresBats / batFearRadius の範囲を避ける）")]
+    [SerializeField] bool fearFire = true;
+    [SerializeField] float fearPathMargin = 0.5f; // 突っ込む経路が火の範囲にこれだけ近いと攻撃しない
+    [SerializeField] bool fearPlayerFire = false;  // Playerが燃えているときも怖がるか
+    [SerializeField] float playerFireFearRadius = 3f;
+
     private SpriteRenderer spriteRenderer;
+    private Player playerComponent;
     private Color originalColor;
     [SerializeField ]private float hitTimer = 0f; // 0〜hitTimeで蓄積し、hitTimeに達すると死ぬ
     private float arrowNoRecoverTimer = 0f;
@@ -66,6 +73,8 @@ public class BatEnemy : MonoBehaviour, IIgnitable
             Debug.LogWarning("天井の待機ポイント (Ceiling Points) が設定されていません！");
         }
 
+        if (player != null) playerComponent = player.GetComponent<Player>();
+
         spriteRenderer = GetComponent<SpriteRenderer>();
         if (spriteRenderer != null)
         {
@@ -76,9 +85,16 @@ public class BatEnemy : MonoBehaviour, IIgnitable
     void Update()
     {
         // 待機状態 ＆ プレイヤーが存在する ＆ プレイヤーとの距離が近い場合
-        if (currentState == State.Idle && player != null)
+        if (currentState == State.Idle)
         {
-            if (Vector2.Distance(transform.position, player.position) <= triggerDistance)
+            // 待機中に近くで火がついたら、火から離れた天井へ逃げる
+            if (IsInFearZone(transform.position))
+            {
+                StartCoroutine(FleeFromFire());
+            }
+            else if (player != null
+                && Vector2.Distance(transform.position, player.position) <= triggerDistance
+                && !IsPathBlockedByFire(transform.position, player.position))
             {
                 StartCoroutine(SwoopAttack());
             }
@@ -226,11 +242,105 @@ public class BatEnemy : MonoBehaviour, IIgnitable
         currentState = State.Idle;
     }
 
+    // 火から離れた天井ポイントへ飛んで逃げる
+    private IEnumerator FleeFromFire()
+    {
+        currentState = State.Returning;
+        Transform next = GetRandomCeilingPoint(currentCeilingPoint);
+        if (next == currentCeilingPoint || next == transform)
+        {
+            // 逃げ場がない場合はその場で待つ
+            currentState = State.Cooldown;
+            yield return new WaitForSeconds(cooldownTime);
+            currentState = State.Idle;
+            yield break;
+        }
+
+        startPos = transform.position;
+        targetPos = next.position;
+        currentCeilingPoint = next;
+
+        float timer = 0f;
+        while (timer < swoopDuration)
+        {
+            timer += Time.deltaTime;
+            float t = timer / swoopDuration;
+            Vector2 linearPos = Vector2.Lerp(startPos, targetPos, t);
+            float arcOffset = Mathf.Sin(t * Mathf.PI) * returnArc;
+            transform.position = linearPos + new Vector2(0, arcOffset);
+            yield return null;
+        }
+        transform.position = targetPos;
+        currentState = State.Idle;
+    }
+
+    // 指定位置が、怖い火の範囲内か
+    private bool IsInFearZone(Vector2 pos)
+    {
+        if (fearFire)
+        {
+            foreach (IgnoreFire fire in IgnoreFire.All)
+            {
+                if (!fire.scaresBats || !fire.IsLit) continue;
+                if (Vector2.Distance(pos, fire.LightCenter) < fire.batFearRadius) return true;
+            }
+        }
+        if (IsPlayerFireScary() && Vector2.Distance(pos, player.position) < playerFireFearRadius) return true;
+        return false;
+    }
+
+    // from→to の突っ込む経路が、怖い火の範囲を通るか（目標地点が範囲内の場合も含む）
+    private bool IsPathBlockedByFire(Vector2 from, Vector2 to)
+    {
+        if (fearFire)
+        {
+            foreach (IgnoreFire fire in IgnoreFire.All)
+            {
+                if (!fire.scaresBats || !fire.IsLit) continue;
+                if (DistanceToSegment(fire.LightCenter, from, to) < fire.batFearRadius + fearPathMargin) return true;
+            }
+        }
+        // Playerが燃えていて怖い場合は、Playerを襲わない
+        if (IsPlayerFireScary()) return true;
+        return false;
+    }
+
+    private bool IsPlayerFireScary()
+    {
+        return fearPlayerFire && player != null && playerComponent != null && playerComponent.IsOnFire();
+    }
+
+    private static float DistanceToSegment(Vector2 p, Vector2 a, Vector2 b)
+    {
+        Vector2 ab = b - a;
+        float lenSq = ab.sqrMagnitude;
+        if (lenSq < 0.0001f) return Vector2.Distance(p, a);
+        float t = Mathf.Clamp01(Vector2.Dot(p - a, ab) / lenSq);
+        return Vector2.Distance(p, a + ab * t);
+    }
+
     // 今いるポイント「以外」からランダムに次の天井ポイントを選ぶ処理
+    // （火を怖がる場合は、火の範囲にないポイントを優先する）
     private Transform GetRandomCeilingPoint(Transform excludePoint)
     {
         if (ceilingPoints == null || ceilingPoints.Length == 0) return transform;
         if (ceilingPoints.Length == 1) return ceilingPoints[0];
+
+        // 火の範囲外のポイント（今いる所以外）から選ぶ
+        var safePoints = new System.Collections.Generic.List<Transform>();
+        bool anyScary = false;
+        foreach (Transform point in ceilingPoints)
+        {
+            if (point == null || point == excludePoint) continue;
+            if (IsInFearZone(point.position)) anyScary = true;
+            else safePoints.Add(point);
+        }
+        if (anyScary)
+        {
+            if (safePoints.Count > 0) return safePoints[Random.Range(0, safePoints.Count)];
+            // 安全な場所がない：移動せず今の場所に留まる
+            if (excludePoint != null) return excludePoint;
+        }
 
         Transform picked;
         do

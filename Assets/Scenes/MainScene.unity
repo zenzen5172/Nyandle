@@ -8790,6 +8790,14 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 7451902130062975211, guid: d302d1777f0a86a4d8ab828d08c4000c, type: 3}
+      propertyPath: batFearRadius
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 7451902130062975211, guid: d302d1777f0a86a4d8ab828d08c4000c, type: 3}
+      propertyPath: batDamageRadius
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 7520627076855677315, guid: d302d1777f0a86a4d8ab828d08c4000c, type: 3}
       propertyPath: m_FalloffIntensity
       value: 0.57
@@ -9433,6 +9441,14 @@ PrefabInstance:
     - target: {fileID: 1428607201146181822, guid: d302d1777f0a86a4d8ab828d08c4000c, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7451902130062975211, guid: d302d1777f0a86a4d8ab828d08c4000c, type: 3}
+      propertyPath: batFearRadius
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 7451902130062975211, guid: d302d1777f0a86a4d8ab828d08c4000c, type: 3}
+      propertyPath: batDamageRadius
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 7520627076855677315, guid: d302d1777f0a86a4d8ab828d08c4000c, type: 3}
       propertyPath: m_FalloffIntensity
@@ -11418,6 +11434,10 @@ MonoBehaviour:
   hurtGlowIntensity: 6
   arrowDamage: 3
   arrowNoRecoverTime: 2
+  fearFire: 1
+  fearPathMargin: 0.5
+  fearPlayerFire: 0
+  playerFireFearRadius: 3
   hitTimer: 0
 --- !u!212 &1098494022
 SpriteRenderer:
@@ -14593,6 +14613,14 @@ PrefabInstance:
     - target: {fileID: 1428607201146181822, guid: d302d1777f0a86a4d8ab828d08c4000c, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7451902130062975211, guid: d302d1777f0a86a4d8ab828d08c4000c, type: 3}
+      propertyPath: batFearRadius
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 7451902130062975211, guid: d302d1777f0a86a4d8ab828d08c4000c, type: 3}
+      propertyPath: batDamageRadius
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 7520627076855677315, guid: d302d1777f0a86a4d8ab828d08c4000c, type: 3}
       propertyPath: m_FalloffIntensity
