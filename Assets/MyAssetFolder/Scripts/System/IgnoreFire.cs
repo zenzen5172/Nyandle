@@ -5,10 +5,14 @@ public class IgnoreFire : MonoBehaviour, IIgnitable
 {
     public GameObject fire;
 
-    [Header("松明の光でコウモリにダメージ")]
+    [Header("コウモリが火に突っ込むと「熱っ！」と怯む")]
     public bool damageBats = true;
-    public float batDamageRadius = 3f;       // この範囲内のコウモリにダメージ（Sceneビューで選択すると範囲が表示される）
-    public float batDamageMultiplier = 1f;   // ダメージの強さ（1でPlayerの光の外縁と同じ速さ）
+    public float batDamageRadius = 3f;       // この範囲に入ったコウモリが怯む（Sceneビューで選択するとオレンジの円で表示）
+    public float batDamageMultiplier = 1f;   // じわじわダメージの強さ（BatEnemyの torchContinuousDamage がONのときだけ使う）
+
+    [Header("コウモリが怖がって避ける（たき火など大きな火に）")]
+    public bool scaresBats = true;
+    public float batFearRadius = 5f;         // この範囲には近寄らない（範囲内のプレイヤーは襲われない）
 
     // 火が付いている松明の一覧（BatEnemyが参照する）
     public static readonly List<IgnoreFire> All = new List<IgnoreFire>();
@@ -50,8 +54,15 @@ public class IgnoreFire : MonoBehaviour, IIgnitable
 
     void OnDrawGizmosSelected()
     {
-        if (!damageBats) return;
-        Gizmos.color = new Color(1f, 0.4f, 0f, 0.8f);
-        Gizmos.DrawWireSphere(LightCenter, batDamageRadius);
+        if (damageBats)
+        {
+            Gizmos.color = new Color(1f, 0.4f, 0f, 0.8f);
+            Gizmos.DrawWireSphere(LightCenter, batDamageRadius);
+        }
+        if (scaresBats)
+        {
+            Gizmos.color = new Color(1f, 0.9f, 0.2f, 0.6f); // 黄色：コウモリが避ける範囲
+            Gizmos.DrawWireSphere(LightCenter, batFearRadius);
+        }
     }
 }

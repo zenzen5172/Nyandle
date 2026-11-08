@@ -53,7 +53,7 @@ public class Player : MonoBehaviour
     [Header("リスポーン直後の操作不能時間（秒）")]
     public float respawnControlLockTime = 0.3f;
     float controlLockTimer;
-    bool IsInputLocked => controlLockTimer > 0f;
+    bool IsInputLocked => controlLockTimer > 0f || AllOverCameraManeger.IsActive; // 俯瞰カメラ中も操作不可
 
     [Header("音声")]
     public AudioClip jumpSound;
