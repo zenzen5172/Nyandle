@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 521173898117696628}
   - component: {fileID: 6784932525998479601}
   - component: {fileID: 8567294648051410643}
+  - component: {fileID: 8134157111047286489}
   m_Layer: 6
   m_Name: WoodBoxOnly
   m_TagString: Box
@@ -80,7 +81,7 @@ SpriteRenderer:
   m_LightmapParameters: {fileID: 0}
   m_GlobalIlluminationMeshLod: 0
   m_SortingLayerID: 1393088907
-  m_SortingLayer: 5
+  m_SortingLayer: 7
   m_SortingOrder: 0
   m_MaskInteraction: 0
   m_Sprite: {fileID: 21300000, guid: d2d6d59784621dc438f36adf9440d438, type: 3}
@@ -166,3 +167,29 @@ BoxCollider2D:
   m_AutoTiling: 0
   m_Size: {x: 0.98, y: 1}
   m_EdgeRadius: 0
+--- !u!233 &8134157111047286489
+HingeJoint2D:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6892759410675839268}
+  m_Enabled: 1
+  serializedVersion: 4
+  m_EnableCollision: 0
+  m_ConnectedRigidBody: {fileID: 0}
+  m_BreakForce: Infinity
+  m_BreakTorque: Infinity
+  m_BreakAction: 3
+  m_AutoConfigureConnectedAnchor: 1
+  m_Anchor: {x: 0, y: 0}
+  m_ConnectedAnchor: {x: 93.98, y: -29.02}
+  m_UseConnectedAnchor: 1
+  m_UseMotor: 0
+  m_Motor:
+    m_MotorSpeed: 0
+    m_MaximumMotorForce: 10000
+  m_UseLimits: 0
+  m_AngleLimits:
+    m_LowerAngle: 0
+    m_UpperAngle: 359

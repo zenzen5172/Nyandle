@@ -82,7 +82,7 @@ SpriteRenderer:
   m_LightmapParameters: {fileID: 0}
   m_GlobalIlluminationMeshLod: 0
   m_SortingLayerID: 461272777
-  m_SortingLayer: 1
+  m_SortingLayer: 3
   m_SortingOrder: 0
   m_MaskInteraction: 0
   m_Sprite: {fileID: 7482667652216324306, guid: 311925a002f4447b3a28927169b83ea6, type: 3}
@@ -107,10 +107,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 53c0480658e5203418c6576b9fbf3476, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DownBlock
-  dropTime: 0.5
+  dropTime: 0
   respawnTime: 0
   steppedTimer: 0
-  touchedTime: 0.5
+  touchedTime: 0
   touchedTimer: 0
   isActivated: 0
   isDropped: 0
