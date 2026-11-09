@@ -284,7 +284,7 @@ public class Player : MonoBehaviour
 
         OnRespawn?.Invoke(); // 既存のイベント呼び出しがあれば
     }
-
+     
     public void GrantExtraJump(int amount = 1)
     {
         jumpCount += amount;

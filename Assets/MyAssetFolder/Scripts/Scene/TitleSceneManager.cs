@@ -3,6 +3,7 @@ using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
 using Unity.VisualScripting;
+using UnityEngine.Assemblies;
 
 public class TitleSceneManager: MonoBehaviour, IPointerDownHandler, IPointerUpHandler
 {
@@ -29,12 +30,13 @@ public class TitleSceneManager: MonoBehaviour, IPointerDownHandler, IPointerUpHa
 
     void Update()
     {
-        
-    }
-
-    public void StartSceneBtn()
-    {
-        
+        if (Input.GetKey(KeyCode.Space))
+        {
+            startBtnImage.color = Color.black;
+            isBtnPressed = true;
+            isBtnReleased = true;
+            SceneManager.LoadScene(nextScene);
+        }
     }
 
     // マウスクリックの処理
