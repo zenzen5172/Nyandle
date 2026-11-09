@@ -4,6 +4,10 @@ public class ChatArea : MonoBehaviour
 {
     public string text;
     private CatChat catChat;
+
+    [SerializeField] private bool willVanish = false;
+    [SerializeField] private float vanishTime = 0f;
+
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
@@ -32,6 +36,23 @@ public class ChatArea : MonoBehaviour
                 catChat.colliderCount = 0; 
             }
         }
+
+        if (willVanish == true)
+        {
+            Destroy(gameObject, vanishTime);
+        }
+    }
+
+    public void UpdateAndShowText(string newText)
+    {
+        text = newText;
+        if (catChat != null)
+        {
+            catChat.HideText();
+            catChat.ShowText(text);
+
+        }
     }
 
 }
+
