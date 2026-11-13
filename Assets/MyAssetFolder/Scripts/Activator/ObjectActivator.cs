@@ -4,7 +4,9 @@ using UnityEngine;
 public class ObjectActivator : MonoBehaviour
 {
     [SerializeField] GameObject[] targetObjects;
+    [SerializeField] int activateTime = 500;
     [SerializeField] private bool wasTouched = false;
+
 
     void Start()
     {
@@ -17,7 +19,7 @@ public class ObjectActivator : MonoBehaviour
 
     private async Task OnTriggerEnter2D(Collider2D other)
     {
-        await Task.Delay(500);
+        await Task.Delay(activateTime);
 
         if (!wasTouched)
         {
