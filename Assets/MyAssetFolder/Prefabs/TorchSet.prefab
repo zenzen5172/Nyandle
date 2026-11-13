@@ -79,7 +79,7 @@ SpriteRenderer:
   m_LightmapParameters: {fileID: 0}
   m_GlobalIlluminationMeshLod: 0
   m_SortingLayerID: 383542369
-  m_SortingLayer: 3
+  m_SortingLayer: 5
   m_SortingOrder: 0
   m_MaskInteraction: 0
   m_Sprite: {fileID: 21300000, guid: c439b5dee5d731747bb39e6e2ac0b413, type: 3}
@@ -108,7 +108,7 @@ MonoBehaviour:
   m_LightType: 3
   m_BlendStyleIndex: 0
   m_FalloffIntensity: 0.503
-  m_Color: {r: 1, g: 0.7372549, b: 0.57254905, a: 1}
+  m_Color: {r: 1, g: 0.64705884, b: 0.42745098, a: 1}
   m_Intensity: 2
   m_LightVolumeIntensity: 1
   m_LightVolumeEnabled: 0
@@ -225,7 +225,7 @@ SpriteRenderer:
   m_LightmapParameters: {fileID: 0}
   m_GlobalIlluminationMeshLod: 0
   m_SortingLayerID: 383542369
-  m_SortingLayer: 3
+  m_SortingLayer: 5
   m_SortingOrder: 0
   m_MaskInteraction: 0
   m_Sprite: {fileID: 7482667652216324306, guid: 311925a002f4447b3a28927169b83ea6, type: 3}
@@ -251,6 +251,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::IgnoreFire
   fire: {fileID: 3770493231934025830}
+  damageBats: 1
+  batDamageRadius: 3
+  batDamageMultiplier: 1
+  scaresBats: 1
+  batFearRadius: 5
 --- !u!61 &6868101756752145980
 BoxCollider2D:
   m_ObjectHideFlags: 0

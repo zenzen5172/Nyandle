@@ -2,17 +2,21 @@ using UnityEngine;
 
 public class DropBlock : MonoBehaviour
 {
-    [SerializeField] private float dropTime = 2f;     // 着地して、落下するまでの時間
-    [SerializeField] private float respawnTime = 3f;  // 落下してから復活するまでの時間
-    [SerializeField] private float steppedTimer = 0f;  // 経過時間
+    [Header("Settings")]
     [SerializeField] private float touchedTime = 1f;   // これだけ乗っていれば、落下確定
+    [SerializeField] private float dropTime = 2f;      // 確定後、落下するまでの時間
+    [SerializeField] private float hideTime = 1.5f;    // 落下開始から非表示になるまでの時間
+    [SerializeField] private float respawnTime = 3f;   // 非表示から復活するまでの時間
+
+    [Header("Debug View")]
     [SerializeField] private float touchedTimer = 0f;
+    [SerializeField] private float steppedTimer = 0f;
+    [SerializeField] private float respawnTimer = 0f;
     [SerializeField] private bool isActivated = false;
-    [SerializeField] private bool isDropped = false;   // 落下処理が実行されたかどうかのフラグ
+    [SerializeField] private bool isDropped = false;
 
     private bool isTouchingPlayer = false;
     private Vector3 initialPosition;      // 初期位置の記憶
-    private float respawnTimer = 0f;      // 復活用のタイマー
 
     private Rigidbody2D rb;
     private SpriteRenderer sr;
@@ -25,11 +29,8 @@ public class DropBlock : MonoBehaviour
         col = GetComponent<Collider2D>();
 
         rb.sleepMode = RigidbodySleepMode2D.NeverSleep;
-
-        // ゲーム開始時の位置を記憶
         initialPosition = transform.position;
 
-        // 初期状態にセット
         ResetBlock();
     }
 
@@ -40,14 +41,14 @@ public class DropBlock : MonoBehaviour
         {
             respawnTimer += Time.deltaTime;
 
-            // 落下から1.5秒経過したら、姿と当たり判定を消して初期位置へ移動
-            if (respawnTimer >= 1.5f && sr.enabled)
+            // マジックナンバーだった 1.5f を hideTime に変更
+            if (respawnTimer >= hideTime && sr.enabled)
             {
                 SetBlockVisible(false);
             }
 
-            // 指定時間（1.5秒 + respawnTime秒）が経ったら完全に復活させる
-            if (respawnTimer >= 1.5f + respawnTime)
+            // 指定時間（hideTime + respawnTime）が経ったら完全に復活させる
+            if (respawnTimer >= hideTime + respawnTime)
             {
                 ResetBlock();
             }
@@ -59,10 +60,7 @@ public class DropBlock : MonoBehaviour
 
             if (steppedTimer >= dropTime)
             {
-                isDropped = true;
-                rb.bodyType = RigidbodyType2D.Dynamic;
-                col.isTrigger = true; // 壁すり抜け
-                sr.color = Color.red;
+                Drop(); // 落下処理をメソッドに分離
             }
         }
         // 3. 乗り始めのカウントダウン
@@ -74,7 +72,7 @@ public class DropBlock : MonoBehaviour
 
                 if (touchedTimer >= touchedTime)
                 {
-                    sr.color = new Color(1f, 0.5f, 0f);
+                    sr.color = new Color(1f, 0.5f, 0f); // オレンジ
                     isActivated = true;
                 }
             }
@@ -85,20 +83,28 @@ public class DropBlock : MonoBehaviour
         }
     }
 
+    // 落下処理
+    private void Drop()
+    {
+        isDropped = true;
+        rb.bodyType = RigidbodyType2D.Dynamic;
+        //col.isTrigger = true; // 壁すり抜け
+        sr.color = Color.red;
+    }
+
     // ブロックを初期状態にリセットする関数
     private void ResetBlock()
     {
-        // 位置と物理挙動のリセット
         transform.position = initialPosition;
         rb.bodyType = RigidbodyType2D.Kinematic;
-        rb.linearVelocity = Vector2.zero; // 移動速度をクリア
+
+        // 注: Unity 2023.2以前のバージョンをお使いの場合は、linearVelocity ではなく velocity を使用してください
+        rb.linearVelocity = Vector2.zero;
         rb.angularVelocity = 0f;
 
-        // コライダーと色のリセット
         col.isTrigger = false;
-        sr.color = new Color(0.5f, 1f, 0.5f);
+        sr.color = new Color(0.5f, 1f, 0.5f); // 緑色
 
-        // タイマーとフラグのリセット
         steppedTimer = 0f;
         touchedTimer = 0f;
         respawnTimer = 0f;
@@ -107,11 +113,9 @@ public class DropBlock : MonoBehaviour
         isDropped = false;
         isTouchingPlayer = false;
 
-        // 見た目と当たり判定を表示
         SetBlockVisible(true);
     }
 
-    // 表示・非表示を切り替える関数
     private void SetBlockVisible(bool visible)
     {
         sr.enabled = visible;
@@ -122,7 +126,12 @@ public class DropBlock : MonoBehaviour
     {
         if (collision.gameObject.CompareTag("Player"))
         {
-            isTouchingPlayer = true;
+            // プレイヤーがブロックの「上から」乗った時のみ反応させる
+            // 接触面の法線ベクトルのYが下向き(-0.5以下)なら、プレイヤーは上にいる
+            if (collision.contacts[0].normal.y < -0.5f)
+            {
+                isTouchingPlayer = true;
+            }
         }
     }
 
