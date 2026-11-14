@@ -1,106 +1,91 @@
 using System.Collections;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 public class Cannon : MonoBehaviour
 {
-    [SerializeField] Transform cannonPoint; //発射口
+    [SerializeField] Transform cannonPoint; // 発射口
     [SerializeField] Vector2 cannonDirection = new Vector2(1, 1);
 
-    [Header("大砲のパワー")]
-    [SerializeField] float strongPower = 20f; // 導火線ありの強いパワー
-    [SerializeField] float weakPower = 5f;    // 導火線なしの弱いパワー
+    [Header("吸い込み演出")]
+    [SerializeField, Min(0.01f)] float entryDuration = 0.35f;
 
-    // 🌟【追加】強発射時にプレイヤーが操作できない時間
-    [Header("強発射後の操作不能時間（秒）")]
-    [SerializeField] float stunDuration = 1.0f;
+    [Header("大砲のパワー")]
+    [SerializeField] float strongPower = 20f;
+    [SerializeField] float weakPower = 5f;
+    [SerializeField] float stunDuration = 1f;
 
     [Header("連携する導火線")]
-    [SerializeField] CannonFuse fuse; // 導火線
+    [SerializeField] CannonFuse fuse;
 
-    private bool isCannon = false;
+    Player passenger;
+    bool isBusy;
 
-    private void OnTriggerEnter2D(Collider2D collision)
+    void OnTriggerEnter2D(Collider2D collision)
     {
-        if (collision.CompareTag("Player") && !isCannon)
-        {
-            StartCoroutine(CannonSequence(collision.gameObject));
-        }
+        if (isBusy || cannonPoint == null || collision.isTrigger || !collision.CompareTag("Player")) return;
+        if (!collision.TryGetComponent(out Player player) || !player.TryEnterCannon(this)) return;
+
+        passenger = player;
+        isBusy = true;
+        StartCoroutine(CannonSequence(player, fuse != null && fuse.isLit));
     }
 
-    private IEnumerator CannonSequence(GameObject playerObj)
+    IEnumerator CannonSequence(Player player, bool isPowered)
     {
-        isCannon = true;
+        Transform rider = player.transform;
+        Vector3 startPosition = rider.position;
+        Vector3 startScale = rider.localScale;
+        Vector3 inside = Vector3.Lerp(cannonPoint.position, transform.position, 0.35f);
+        bool launchRequested = false;
 
-        Player player = playerObj.GetComponent<Player>();
-        Rigidbody2D rb = playerObj.GetComponent<Rigidbody2D>();
-        SpriteRenderer sr = playerObj.GetComponentInChildren<SpriteRenderer>();
-
-        // プレイヤーの制御をオフにして大砲の中に隠す
-        player.canControl = false;
-        sr.enabled = false;
-        rb.linearVelocity = Vector2.zero;
-        rb.bodyType = RigidbodyType2D.Kinematic;
-        playerObj.transform.position = transform.position;
-
-        // 大砲に入った時点で導火線に火がついているかチェック
-        bool isPowered = (fuse != null && fuse.isLit);
-
-        if (isPowered)
+        for (float elapsed = 0f; elapsed < entryDuration; elapsed += Time.deltaTime)
         {
-            // 導火線に火がついている場合：燃え尽きるまで自動待機
-            while (fuse != null && fuse.isLit)
-            {
+            if (!HasPassenger(player)) break;
+
+            launchRequested |= SpacePressed();
+            float progress = elapsed / entryDuration;
+            float pull = progress * progress;
+            rider.position = Vector3.Lerp(startPosition, inside, pull);
+            rider.localScale = Vector3.Lerp(startScale, startScale * 0.08f, progress);
+            yield return null;
+        }
+
+        if (HasPassenger(player))
+        {
+            rider.position = inside;
+            player.HideInCannon();
+
+            while (HasPassenger(player) && (isPowered ? fuse != null && fuse.isLit : !launchRequested && !SpacePressed()))
                 yield return null;
-            }
-
-            if (fuse != null)
-            {
-                fuse.CannonEntered();
-            }
         }
-        else
+
+        if (HasPassenger(player))
         {
-            // 導火線に火がついていない場合：手動待機
-            while (!Input.GetKeyDown(KeyCode.Space))
-            {
-                yield return null;
-            }
+            if (isPowered && fuse != null) fuse.CannonEntered();
+
+            float power = isPowered ? strongPower : weakPower;
+            float controlDelay = isPowered ? stunDuration : 0f;
+            player.LeaveCannon(cannonPoint.position, cannonDirection * power, controlDelay);
+            passenger = null;
+            yield return new WaitForSeconds(0.5f);
         }
 
-        // --- 以下、発射処理 ---
-        playerObj.transform.position = cannonPoint.position;
-        sr.enabled = true;
-        rb.bodyType = RigidbodyType2D.Dynamic;
-        player.isLaunched = true;
-
-        // 🌟【変更】発射時のパワーと操作可能タイミングの分岐
-        if (isPowered)
-        {
-            // 強発射
-            rb.linearVelocity = cannonDirection * strongPower;
-            player.canControl = false; // 🌟一旦操作不可のままにする
-            StartCoroutine(EnablePlayerControl(player, stunDuration)); // 🌟指定秒数後に操作可能にする
-        }
-        else
-        {
-            // 弱発射
-            rb.linearVelocity = cannonDirection * weakPower;
-            player.canControl = true; // 🌟弱発射はすぐに操作可能
-            player.isLaunched = false;
-        }
-
-        yield return new WaitForSeconds(0.5f);
-        isCannon = false;
+        passenger = null;
+        isBusy = false;
     }
 
-    // 🌟【追加】指定した秒数だけ待ってから、プレイヤーの操作制限を解除する処理
-    // isLaunched は着地するまで Player 側で true のままにして、発射の慣性を残す
-    private IEnumerator EnablePlayerControl(Player player, float delay)
+    bool HasPassenger(Player player) => player != null && player.IsInCannon(this);
+
+    static bool SpacePressed() => !AllOverCameraManeger.IsActive && Keyboard.current?.spaceKey.wasPressedThisFrame == true;
+
+    void OnDisable()
     {
-        yield return new WaitForSeconds(delay);
-        if (player != null && !player.IsDead)
-        {
-            player.canControl = true;
-        }
+        StopAllCoroutines();
+        if (HasPassenger(passenger))
+            passenger.LeaveCannon(cannonPoint.position, Vector2.zero, 0f);
+
+        passenger = null;
+        isBusy = false;
     }
 }

@@ -54,6 +54,9 @@ public class Player : MonoBehaviour
     public float respawnControlLockTime = 0.3f;
     float controlLockTimer;
     bool IsInputLocked => controlLockTimer > 0f || AllOverCameraManeger.IsActive; // 俯瞰カメラ中も操作不可
+    Cannon currentCannon;
+    Vector3 cannonEntryScale;
+    float launchControlTimer;
 
     [Header("音声")]
     public AudioClip jumpSound;
@@ -127,7 +130,7 @@ public class Player : MonoBehaviour
     public bool IsOnFire()
     {
         // 頭上に炎を出している(S/下キー) か、ジャンプ等で発光・点火中であれば true
-        return (flame != null && flame.activeSelf) || fireTimer > 0f;
+        return !isDead && currentCannon == null && ((flame != null && flame.activeSelf) || fireTimer > 0f);
     }
 
     void Awake()
@@ -234,6 +237,7 @@ public class Player : MonoBehaviour
     {
         if (isDead) return;
 
+        ClearCannonEntry();
         isDead = true;
         rb.linearVelocity = Vector2.zero;
         rb.simulated = false;   // 死亡中に物理挙動を停止
@@ -253,29 +257,35 @@ public class Player : MonoBehaviour
     public void Respawn()
     {
         CancelInvoke(nameof(Respawn));
+        ClearCannonEntry();
 
         transform.position = new Vector3(respawnPoint.x, respawnPoint.y, transform.position.z);
-        rb.simulated = true;
         rb.position = respawnPoint;
         rb.linearVelocity = Vector2.zero;
+        rb.angularVelocity = 0f;
+        rb.bodyType = RigidbodyType2D.Dynamic;
+        rb.simulated = true;
 
         jumpBuffer = 0f;
         jumpSoundPlayedEarly = false;
         coyoteTimer = 0f;
         isRising = false;
         canBoost = false;
+        isGrounded = false;
         jumpCount = maxJumpCount;
         groundJumpSpent = false;
 
         jumpable = false;
         canControl = true;
         isLaunched = false;
+        launchControlTimer = 0f;
+        fireTimer = 0f;
+        flame.SetActive(false);
 
         // リスポーン直後は一瞬だけ操作を受け付けない
         controlLockTimer = respawnControlLockTime;
 
         spriteRenderer.enabled = true;
-        rb.bodyType = RigidbodyType2D.Dynamic;
         isDead = false;
 
         // 🌟【追加】リスポーン時に弓をリセット
@@ -284,7 +294,65 @@ public class Player : MonoBehaviour
 
         OnRespawn?.Invoke(); // 既存のイベント呼び出しがあれば
     }
-     
+
+    internal bool TryEnterCannon(Cannon cannon)
+    {
+        if (isDead || currentCannon != null) return false;
+
+        DetachFromMovingPlatform();
+        currentCannon = cannon;
+        cannonEntryScale = transform.localScale;
+        canControl = false;
+        isLaunched = false;
+        launchControlTimer = 0f;
+        jumpBuffer = 0f;
+        jumpSoundPlayedEarly = false;
+        coyoteTimer = 0f;
+        isGrounded = false;
+        isRising = false;
+        canBoost = false;
+        fireTimer = 0f;
+        flame.SetActive(false);
+        CancelAiming();
+
+        rb.linearVelocity = Vector2.zero;
+        rb.angularVelocity = 0f;
+        rb.simulated = false;
+        UpdateAppearance();
+        return true;
+    }
+
+    internal bool IsInCannon(Cannon cannon) => currentCannon == cannon;
+
+    internal void HideInCannon() => spriteRenderer.enabled = false;
+
+    internal void LeaveCannon(Vector3 position, Vector2 velocity, float controlDelay)
+    {
+        ClearCannonEntry();
+        transform.position = position;
+        rb.position = position;
+        rb.simulated = true;
+        rb.linearVelocity = velocity;
+        spriteRenderer.enabled = true;
+        isLaunched = velocity != Vector2.zero;
+        launchControlTimer = controlDelay;
+        canControl = controlDelay <= 0f;
+    }
+
+    void ClearCannonEntry()
+    {
+        if (ReferenceEquals(currentCannon, null)) return;
+
+        currentCannon = null;
+        transform.localScale = cannonEntryScale;
+    }
+
+    void DetachFromMovingPlatform()
+    {
+        if (transform.parent != null && transform.parent.TryGetComponent<MovingPlatform>(out _))
+            transform.SetParent(null);
+    }
+
     public void GrantExtraJump(int amount = 1)
     {
         jumpCount += amount;
@@ -304,10 +372,17 @@ public class Player : MonoBehaviour
     void Update()
     {
         var kb = Keyboard.current;
-        if (kb == null || isDead) return;
+        if (isDead || currentCannon != null) return;
 
         if (controlLockTimer > 0f) controlLockTimer -= Time.deltaTime;
         if (intervalArrowTimer > 0f) intervalArrowTimer -= Time.deltaTime;
+        if (launchControlTimer > 0f)
+        {
+            launchControlTimer -= Time.deltaTime;
+            if (launchControlTimer <= 0f) canControl = true;
+        }
+
+        if (kb == null) return;
         bool inputLocked = IsInputLocked;
 
         // canControlがtrueの時、または空中・ジャンプ可能な時に入力を受付
@@ -532,7 +607,7 @@ public class Player : MonoBehaviour
 
     void FixedUpdate()
     {
-        if (isDead) return;
+        if (isDead || currentCannon != null) return;
 
         jumpBuffer -= Time.fixedDeltaTime;
 
