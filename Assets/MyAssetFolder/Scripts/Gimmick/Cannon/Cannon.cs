@@ -18,6 +18,7 @@ public class Cannon : MonoBehaviour
 
     [Header("音声")]
     public AudioClip shotSound;
+    public AudioClip weakShotSound;
     private AudioSource audioSource;
 
     private bool isCannon = false;
