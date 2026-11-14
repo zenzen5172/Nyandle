@@ -98,6 +98,12 @@ public class FireArrow : MonoBehaviour
         if (IsOwner(other)) return;
         if (other.GetComponentInParent<FireArrow>() != null) return;   // 矢同士は無視
 
+        if (owner != null && owner.TryGetComponent(out Player player) && player.CanBurnWoodBoxes
+            && other.TryGetComponent(out BurnableWoodBox woodBox))
+        {
+            woodBox.Ignite();
+        }
+
         // 火に反応するもの（松明・導火線・綱・コウモリ）
         // 親までさかのぼるのはトリガー（導火線の着火判定の子オブジェクトなど）のときだけ。
         // 振り子の箱のように「綱の子にある固い物」に当たっても綱が切れないようにする

@@ -35,6 +35,7 @@ public class Player : MonoBehaviour
     [Header("発光・火の判定")]
     public Color glowColor = Color.yellow;
     public float fireDuration = 0.1f;
+    [SerializeField] bool canBurnWoodBoxes = false;
     public bool jumpable = false;
     private float fireTimer = 0f;
 
@@ -125,6 +126,14 @@ public class Player : MonoBehaviour
     public float IntervalArrowRemaining => intervalArrowTimer;
     public float IntervalArrowRatio => intervalArrow > 0f ? Mathf.Clamp01(intervalArrowTimer / intervalArrow) : 0f;
     public bool IsAimingArrow => isAiming;
+
+    public bool CanBurnWoodBoxes
+    {
+        get => canBurnWoodBoxes;
+        set => canBurnWoodBoxes = value;
+    }
+
+    internal bool IsJumpFireActive => !isDead && currentCannon == null && fireTimer > 0f;
 
     // 🌟【追加】CannonFuseやCuttableRopeが参照する「燃えている状態か」の判定
     public bool IsOnFire()
