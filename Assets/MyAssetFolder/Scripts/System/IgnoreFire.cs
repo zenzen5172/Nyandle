@@ -4,6 +4,8 @@ using UnityEngine;
 public class IgnoreFire : MonoBehaviour, IIgnitable
 {
     public GameObject fire;
+    public AudioClip ignoreSound;
+    private AudioSource audioSource;
 
     [Header("コウモリが火に突っ込むと「熱っ！」と怯む")]
     public bool damageBats = true;
@@ -26,6 +28,7 @@ public class IgnoreFire : MonoBehaviour, IIgnitable
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
+        audioSource = GetComponent<AudioSource>();
         if (fire != null)
         {
             fire.SetActive(false);
@@ -39,6 +42,8 @@ public class IgnoreFire : MonoBehaviour, IIgnitable
             if (fire != null)
             {
                 fire.SetActive(true);
+                audioSource.PlayOneShot(ignoreSound);
+
             }
         }
     }
@@ -49,6 +54,7 @@ public class IgnoreFire : MonoBehaviour, IIgnitable
         if (fire != null)
         {
             fire.SetActive(true);
+            audioSource.PlayOneShot(ignoreSound);
         }
     }
 
