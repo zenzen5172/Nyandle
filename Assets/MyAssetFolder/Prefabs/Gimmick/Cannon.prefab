@@ -181,6 +181,7 @@ MonoBehaviour:
   stunDuration: 1
   fuse: {fileID: 0}
   shotSound: {fileID: 8300000, guid: 6972a49c597a31640b57805a57dd8bf5, type: 3}
+  weakShotSound: {fileID: 8300000, guid: 9531a834c74edb345bb828317eaa3410, type: 3}
 --- !u!82 &-5251233723730913105
 AudioSource:
   m_ObjectHideFlags: 0

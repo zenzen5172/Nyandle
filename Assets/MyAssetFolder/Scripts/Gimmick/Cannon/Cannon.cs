@@ -116,6 +116,7 @@ public class Cannon : MonoBehaviour
         {
             // 弱発射
             rb.linearVelocity = cannonDirection * weakPower;
+            audioSource.PlayOneShot(weakShotSound);
 
             // 🌟弱発射でも一瞬(0.15秒)だけ操作不可にし、Playerスクリプトによる速度の上書きを防ぐ
             player.canControl = false;

@@ -20911,6 +20911,7 @@ MonoBehaviour:
   stunDuration: 1
   fuse: {fileID: 0}
   shotSound: {fileID: 0}
+  weakShotSound: {fileID: 0}
 --- !u!1001 &1125395181
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -223422,7 +223423,7 @@ Transform:
   m_GameObject: {fileID: 1800142067}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 60.27, y: -24.09, z: 0}
+  m_LocalPosition: {x: 40.6, y: -3.85, z: 0}
   m_LocalScale: {x: 2, y: 2, z: 2}
   m_ConstrainProportionsScale: 0
   m_Children:
