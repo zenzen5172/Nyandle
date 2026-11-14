@@ -216325,9 +216325,9 @@ MonoBehaviour:
   arrowSpawnDistance: 0.3
   showAimGuide: 1
   aimGuideLength: 2
-  aimGuideWidth: 0.05
-  aimGuideColor: {r: 1, g: 0.6, b: 0.2, a: 0.35}
-  aimGuideMaterial: {fileID: 0}
+  aimGuideWidth: 0.085
+  aimGuideColor: {r: 1, g: 0.72, b: 0.3, a: 0.8}
+  aimGuideMaterial: {fileID: 2100000, guid: 9dfc825aed78fcd4ba02077103263b40, type: 2}
 --- !u!114 &1800142075
 MonoBehaviour:
   m_ObjectHideFlags: 0

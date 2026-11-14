@@ -112,8 +112,8 @@ public class Player : MonoBehaviour
     [Header("弓矢の向きガイド（薄い矢印）")]
     public bool showAimGuide = true;
     public float aimGuideLength = 2f;
-    public float aimGuideWidth = 0.05f;
-    public Color aimGuideColor = new Color(1f, 0.6f, 0.2f, 0.35f);
+    public float aimGuideWidth = 0.085f;
+    public Color aimGuideColor = new Color(1f, 0.72f, 0.3f, 0.8f);
     public Material aimGuideMaterial;   // 未設定なら Sprites/Default を使う
 
     float intervalArrowTimer;           // 次に撃てるまでの残り時間（0なら撃てる）
@@ -121,6 +121,7 @@ public class Player : MonoBehaviour
     Vector2 bowBaseLocalPosition;       // 右向き時の弓のローカル位置
     Vector3 bowBaseLocalScale;
     LineRenderer aimGuide;
+    Material runtimeAimGuideMaterial;
 
     // 火の弓矢UI用（awaizaさんのUIから参照）
     public float IntervalArrowRemaining => intervalArrowTimer;
@@ -191,17 +192,27 @@ public class Player : MonoBehaviour
         aimGuide.numCapVertices = 2;
         aimGuide.startColor = aimGuideColor;
         aimGuide.endColor = aimGuideColor;
-        aimGuide.sortingOrder = 50;
+        aimGuide.sortingLayerID = spriteRenderer.sortingLayerID;
+        aimGuide.sortingOrder = spriteRenderer.sortingOrder + 10;
 
         Material mat = aimGuideMaterial;
         if (mat == null)
         {
             Shader shader = Shader.Find("Sprites/Default");
-            if (shader != null) mat = new Material(shader);
+            if (shader != null)
+            {
+                runtimeAimGuideMaterial = new Material(shader);
+                mat = runtimeAimGuideMaterial;
+            }
         }
         if (mat != null) aimGuide.sharedMaterial = mat;
 
         aimGuide.enabled = false;
+    }
+
+    void OnDestroy()
+    {
+        if (runtimeAimGuideMaterial != null) Destroy(runtimeAimGuideMaterial);
     }
 
     void CreateFlame()
