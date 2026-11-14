@@ -93,6 +93,7 @@ public class Player : MonoBehaviour
 
     public bool IsGrounded => isGrounded;
     public bool IsDead => isDead;
+    internal bool IsRisingFromJump => isRising;
 
 
     // 🌟【追加】弓矢に関する設定
