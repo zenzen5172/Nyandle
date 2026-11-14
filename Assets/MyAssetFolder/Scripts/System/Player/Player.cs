@@ -393,6 +393,12 @@ public class Player : MonoBehaviour
     void Update()
     {
         var kb = Keyboard.current;
+        if (kb != null && !AllOverCameraManeger.IsActive && kb.rKey.wasPressedThisFrame)
+        {
+            Respawn();
+            return;
+        }
+
         if (isDead || currentCannon != null) return;
 
         if (controlLockTimer > 0f) controlLockTimer -= Time.deltaTime;
