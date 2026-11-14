@@ -6,11 +6,14 @@ public class CheckPointLantern : MonoBehaviour
 
     private SpriteRenderer sr;
     private Color originalColor;
+    private AudioSource audioSource;
+    public AudioClip checkSound;
 
 
     private void Start()
     {
         sr = GetComponent<SpriteRenderer>();
+        audioSource = GetComponent<AudioSource>();
         sr.color = Color.gray;
         originalColor = sr.color;
     }
@@ -29,6 +32,10 @@ public class CheckPointLantern : MonoBehaviour
                 if (currentActive != null)
                 {
                     currentActive.ResetColor();
+                }
+                if (checkSound != null && audioSource != null)
+                {
+                    audioSource.PlayOneShot(checkSound);
                 }
                 currentActive = this;
                 sr.color = Color.yellowGreen;

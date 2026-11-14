@@ -10,17 +10,39 @@ public class Cannon : MonoBehaviour
     [SerializeField] float strongPower = 20f; // 導火線ありの強いパワー
     [SerializeField] float weakPower = 5f;    // 導火線なしの弱いパワー
 
-    // 🌟【追加】強発射時にプレイヤーが操作できない時間
     [Header("強発射後の操作不能時間（秒）")]
     [SerializeField] float stunDuration = 1.0f;
 
     [Header("連携する導火線")]
     [SerializeField] CannonFuse fuse; // 導火線
 
+    [Header("音声")]
+    public AudioClip shotSound;
+    private AudioSource audioSource;
+
     private bool isCannon = false;
+    private bool jumpPressed = false; // 🌟入力を確実に検知するためのフラグ
+
+    void Start()
+    {
+        audioSource = GetComponent<AudioSource>();
+    }
+
+    void Update()
+    {
+        // 🌟コルーチン内での入力すり抜けを防ぐため、Update側で入力を監視する
+        if (isCannon)
+        {
+            if (Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.W) || Input.GetKeyDown(KeyCode.UpArrow))
+            {
+                jumpPressed = true;
+            }
+        }
+    }
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
+        // プレイヤーかつ、現在大砲が使用中でなければ
         if (collision.CompareTag("Player") && !isCannon)
         {
             StartCoroutine(CannonSequence(collision.gameObject));
@@ -30,6 +52,7 @@ public class Cannon : MonoBehaviour
     private IEnumerator CannonSequence(GameObject playerObj)
     {
         isCannon = true;
+        jumpPressed = false; // 入力フラグをリセット
 
         Player player = playerObj.GetComponent<Player>();
         Rigidbody2D rb = playerObj.GetComponent<Rigidbody2D>();
@@ -61,7 +84,8 @@ public class Cannon : MonoBehaviour
         else
         {
             // 導火線に火がついていない場合：手動待機
-            while (!Input.GetKeyDown(KeyCode.Space))
+            // 🌟Updateで取得したフラグを使って確実にジャンプ入力を待つ
+            while (!jumpPressed)
             {
                 yield return null;
             }
@@ -71,30 +95,37 @@ public class Cannon : MonoBehaviour
         playerObj.transform.position = cannonPoint.position;
         sr.enabled = true;
         rb.bodyType = RigidbodyType2D.Dynamic;
+
         player.isLaunched = true;
 
-        // 🌟【変更】発射時のパワーと操作可能タイミングの分岐
         if (isPowered)
         {
             // 強発射
             rb.linearVelocity = cannonDirection * strongPower;
-            player.canControl = false; // 🌟一旦操作不可のままにする
-            StartCoroutine(EnablePlayerControl(player, stunDuration)); // 🌟指定秒数後に操作可能にする
+            player.canControl = false;
+
+            if (shotSound != null && audioSource != null)
+            {
+                audioSource.PlayOneShot(shotSound);
+            }
+
+            StartCoroutine(EnablePlayerControl(player, stunDuration));
         }
         else
         {
             // 弱発射
             rb.linearVelocity = cannonDirection * weakPower;
-            player.canControl = true; // 🌟弱発射はすぐに操作可能
-            player.isLaunched = false;
+
+            // 🌟弱発射でも一瞬(0.15秒)だけ操作不可にし、Playerスクリプトによる速度の上書きを防ぐ
+            player.canControl = false;
+            StartCoroutine(EnablePlayerControl(player, 0.15f));
         }
 
-        yield return new WaitForSeconds(0.5f);
+        // 🌟発射後、すぐには大砲に再突入できないようにクールタイムを1秒確保する
+        yield return new WaitForSeconds(1.0f);
         isCannon = false;
     }
 
-    // 🌟【追加】指定した秒数だけ待ってから、プレイヤーの操作制限を解除する処理
-    // isLaunched は着地するまで Player 側で true のままにして、発射の慣性を残す
     private IEnumerator EnablePlayerControl(Player player, float delay)
     {
         yield return new WaitForSeconds(delay);

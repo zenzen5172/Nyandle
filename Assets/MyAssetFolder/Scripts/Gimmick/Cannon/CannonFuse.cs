@@ -28,10 +28,13 @@ public class CannonFuse : MonoBehaviour, IIgnitable
 
     private Collider2D myCollider;
     private SpriteRenderer mySprite;
+    private AudioSource audioSource;
+    public AudioClip fuseSound;
 
     void Start()
     {
         lineRenderer = GetComponent<LineRenderer>();
+        audioSource = GetComponent<AudioSource>();
 
         if (triggerObject == null)
         {
@@ -67,6 +70,8 @@ public class CannonFuse : MonoBehaviour, IIgnitable
             {
                 isLit = false;
                 lineRenderer.positionCount = 0;
+
+                StopFuseSound();
 
                 Invoke(nameof(ResetFuse), reviveDelay);
             }
@@ -143,6 +148,13 @@ public class CannonFuse : MonoBehaviour, IIgnitable
 
         isCompleted = false;
         HideTrigger();
+
+        if (fuseSound != null && audioSource != null)
+        {
+            audioSource.clip = fuseSound;
+            audioSource.loop = true;
+            audioSource.Play();
+        }
     }
 
     private void HideTrigger()
@@ -177,6 +189,8 @@ public class CannonFuse : MonoBehaviour, IIgnitable
         isLit = false;
         lineRenderer.positionCount = 0;
 
+        StopFuseSound();
+
         CancelInvoke(nameof(ResetFuse)); // 失敗用のタイマーをキャンセル
 
         // 🌟【追加】大砲発射の成功後、指定した時間（デフォルト3秒）が経過したら復活させる
@@ -190,6 +204,8 @@ public class CannonFuse : MonoBehaviour, IIgnitable
         currentBurnTimer = 0f;
         ShowTrigger();
 
+        StopFuseSound();
+
         if (originalPositions != null)
         {
             lineRenderer.positionCount = originalPositions.Length;
@@ -197,6 +213,14 @@ public class CannonFuse : MonoBehaviour, IIgnitable
             {
                 lineRenderer.SetPosition(i, originalPositions[i]);
             }
+        }
+    }
+
+    private void StopFuseSound()
+    {
+        if (audioSource != null && audioSource.isPlaying)
+        {
+            audioSource.Stop();
         }
     }
 }

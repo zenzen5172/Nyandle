@@ -60,6 +60,7 @@ public class Player : MonoBehaviour
     public AudioClip deathSound;
     public AudioClip flameSound;   // 炎を出している間ループ再生する
     public AudioClip arrowShotSound; // 矢を撃ったときの音（未設定なら鳴らない）
+   
     bool jumpSoundPlayedEarly;     // FixedUpdateを待たずにUpdateで先にジャンプ音を鳴らしたか
 
     Rigidbody2D rb;

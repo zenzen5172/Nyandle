@@ -7,11 +7,15 @@ public class ReJumpStone : MonoBehaviour
     private Collider2D col;
     private Player playerRef;
     private Color stoneColor;
+    private AudioSource audioSource;
+
+    public AudioClip rejumpSound;
 
     private void Start()
     {
         sr = GetComponent<SpriteRenderer>();
         col = GetComponent<Collider2D>();
+        audioSource = GetComponent<AudioSource>();
         stoneColor = sr.color;
     }
     
@@ -41,8 +45,18 @@ public class ReJumpStone : MonoBehaviour
                 col.enabled = false;
 
                 playerRef = player;
+
+                PlayGetStone();
             }
+
         }
     }
 
+    private void PlayGetStone()
+    {
+        if (rejumpSound != null && audioSource != null)
+        {
+            audioSource.PlayOneShot(rejumpSound);
+        }
+    }
 }
