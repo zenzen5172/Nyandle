@@ -13,13 +13,25 @@ public class Cannon : MonoBehaviour
     [Header("大砲のパワー")]
     [SerializeField] float strongPower = 20f;
     [SerializeField] float weakPower = 5f;
+
+    [Header("強発射後の操作不能時間（秒）")]
     [SerializeField] float stunDuration = 1f;
 
     [Header("連携する導火線")]
     [SerializeField] CannonFuse fuse;
 
+    [Header("音声")]
+    public AudioClip shotSound;
+    public AudioClip weakShotSound;
+    AudioSource audioSource;
+
     Player passenger;
     bool isBusy;
+
+    void Awake()
+    {
+        audioSource = GetComponent<AudioSource>();
+    }
 
     void OnTriggerEnter2D(Collider2D collision)
     {
@@ -43,7 +55,7 @@ public class Cannon : MonoBehaviour
         {
             if (!HasPassenger(player)) break;
 
-            launchRequested |= SpacePressed();
+            launchRequested |= LaunchPressed();
             float progress = elapsed / entryDuration;
             float pull = progress * progress;
             rider.position = Vector3.Lerp(startPosition, inside, pull);
@@ -56,19 +68,29 @@ public class Cannon : MonoBehaviour
             rider.position = inside;
             player.HideInCannon();
 
-            while (HasPassenger(player) && (isPowered ? fuse != null && fuse.isLit : !launchRequested && !SpacePressed()))
+            while (HasPassenger(player) && (isPowered ? fuse != null && fuse.isLit : !launchRequested && !LaunchPressed()))
                 yield return null;
         }
 
         if (HasPassenger(player))
         {
-            if (isPowered && fuse != null) fuse.CannonEntered();
+            if (isPowered)
+            {
+                if (fuse != null) fuse.CannonEntered();
+                if (shotSound != null && audioSource != null)
+                    audioSource.PlayOneShot(shotSound);
+            }
+            else
+            {
+                if (weakShotSound != null && audioSource != null)
+                    audioSource.PlayOneShot(weakShotSound);
+            }
 
             float power = isPowered ? strongPower : weakPower;
-            float controlDelay = isPowered ? stunDuration : 0f;
+            float controlDelay = isPowered ? stunDuration : 0.15f;
             player.LeaveCannon(cannonPoint.position, cannonDirection * power, controlDelay);
             passenger = null;
-            yield return new WaitForSeconds(0.5f);
+            yield return new WaitForSeconds(1f);
         }
 
         passenger = null;
@@ -77,7 +99,12 @@ public class Cannon : MonoBehaviour
 
     bool HasPassenger(Player player) => player != null && player.IsInCannon(this);
 
-    static bool SpacePressed() => !AllOverCameraManeger.IsActive && Keyboard.current?.spaceKey.wasPressedThisFrame == true;
+    static bool LaunchPressed()
+    {
+        if (AllOverCameraManeger.IsActive) return false;
+        Keyboard kb = Keyboard.current;
+        return kb != null && (kb.spaceKey.wasPressedThisFrame || kb.wKey.wasPressedThisFrame || kb.upArrowKey.wasPressedThisFrame);
+    }
 
     void OnDisable()
     {

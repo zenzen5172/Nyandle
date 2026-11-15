@@ -140,8 +140,8 @@ public class FireArrow : MonoBehaviour
         }
     }
 
-    // 矢のスプライトとコライダーの先端はローカル座標の +Y を向く。
-    internal static float AngleForDirection(Vector2 direction) => Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg - 90f;
+    // 矢のスプライト（火の矢.png）とコライダーの先端はローカル座標の +X を向く。
+    internal static float AngleForDirection(Vector2 direction) => Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
 
     static bool IsOneWayPlatform(Collider2D other)
     {

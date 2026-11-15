@@ -9,6 +9,12 @@ public class KeyController : MonoBehaviour
     // 2D用にX・Y軸で追従位置を調整（例：プレイヤーの少し左上）
     public Vector3 offset = new Vector3(-1f, 0.5f, 0f);
 
+    public AudioClip getKeySound;
+    private AudioSource audioSource;
+    void Start()
+    {
+        audioSource = GetComponent<AudioSource>();
+    }
     void Update()
     {
         if (isFollowing && playerTransform != null)
@@ -25,6 +31,8 @@ public class KeyController : MonoBehaviour
         // プレイヤーが触れたら追従を開始
         if (!isFollowing && other.CompareTag("Player"))
         {
+            audioSource.PlayOneShot(getKeySound);
+
             isFollowing = true;
             playerTransform = other.transform;
 

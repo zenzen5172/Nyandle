@@ -2,6 +2,13 @@ using UnityEngine;
 
 public class LockedDoor : MonoBehaviour
 {
+    public AudioClip unLockedSound;
+    private AudioSource audioSource;
+
+    void Start()
+    {
+        audioSource = GetComponent<AudioSource>();
+    }
     // 2D用の衝突判定
     private void OnCollisionEnter2D(Collision2D collision)
     {
@@ -18,7 +25,8 @@ public class LockedDoor : MonoBehaviour
                 {
                     Destroy(inventory.currentKey); // 鍵を消す
                 }
-
+                if (unLockedSound != null && audioSource != null)
+                audioSource.PlayOneShot(unLockedSound);
                 Destroy(gameObject); // 扉自体を消す
             }
         }

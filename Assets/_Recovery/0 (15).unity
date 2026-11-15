@@ -173,7 +173,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7520627076855677315, guid: d302d1777f0a86a4d8ab828d08c4000c, type: 3}
       propertyPath: m_PointLightOuterRadius
-      value: 6
+      value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 8844453962066615011, guid: d302d1777f0a86a4d8ab828d08c4000c, type: 3}
       propertyPath: m_Name
@@ -958,7 +958,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7520627076855677315, guid: d302d1777f0a86a4d8ab828d08c4000c, type: 3}
       propertyPath: m_PointLightOuterRadius
-      value: 6
+      value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 8844453962066615011, guid: d302d1777f0a86a4d8ab828d08c4000c, type: 3}
       propertyPath: m_Name
@@ -1241,7 +1241,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7520627076855677315, guid: d302d1777f0a86a4d8ab828d08c4000c, type: 3}
       propertyPath: m_PointLightOuterRadius
-      value: 6
+      value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 8844453962066615011, guid: d302d1777f0a86a4d8ab828d08c4000c, type: 3}
       propertyPath: m_Name
@@ -2086,7 +2086,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7520627076855677315, guid: d302d1777f0a86a4d8ab828d08c4000c, type: 3}
       propertyPath: m_PointLightOuterRadius
-      value: 6
+      value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 8844453962066615011, guid: d302d1777f0a86a4d8ab828d08c4000c, type: 3}
       propertyPath: m_Name
@@ -2442,7 +2442,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7520627076855677315, guid: d302d1777f0a86a4d8ab828d08c4000c, type: 3}
       propertyPath: m_PointLightOuterRadius
-      value: 6
+      value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 8844453962066615011, guid: d302d1777f0a86a4d8ab828d08c4000c, type: 3}
       propertyPath: m_Name
@@ -2578,7 +2578,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7520627076855677315, guid: d302d1777f0a86a4d8ab828d08c4000c, type: 3}
       propertyPath: m_PointLightOuterRadius
-      value: 6
+      value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 8844453962066615011, guid: d302d1777f0a86a4d8ab828d08c4000c, type: 3}
       propertyPath: m_Name
@@ -2715,7 +2715,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7520627076855677315, guid: d302d1777f0a86a4d8ab828d08c4000c, type: 3}
       propertyPath: m_PointLightOuterRadius
-      value: 6
+      value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 8844453962066615011, guid: d302d1777f0a86a4d8ab828d08c4000c, type: 3}
       propertyPath: m_Name
@@ -4615,7 +4615,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7520627076855677315, guid: d302d1777f0a86a4d8ab828d08c4000c, type: 3}
       propertyPath: m_PointLightOuterRadius
-      value: 6
+      value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 8844453962066615011, guid: d302d1777f0a86a4d8ab828d08c4000c, type: 3}
       propertyPath: m_Name
@@ -4760,7 +4760,10 @@ Transform:
   - {fileID: 1245046429}
   - {fileID: 539009049}
   - {fileID: 366316365}
+<<<<<<< Updated upstream:Assets/_Recovery/0 (15).unity
   - {fileID: 280563808}
+=======
+>>>>>>> Stashed changes:Assets/Scenes/MainScene(Copy).unity
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!4 &555098345 stripped
@@ -5549,7 +5552,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7520627076855677315, guid: d302d1777f0a86a4d8ab828d08c4000c, type: 3}
       propertyPath: m_PointLightOuterRadius
-      value: 6
+      value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 8844453962066615011, guid: d302d1777f0a86a4d8ab828d08c4000c, type: 3}
       propertyPath: m_Name
@@ -5598,7 +5601,7 @@ MonoBehaviour:
   m_LightType: 4
   m_BlendStyleIndex: 0
   m_FalloffIntensity: 0.5
-  m_Color: {r: 0, g: 0.015686275, b: 0.03137255, a: 1}
+  m_Color: {r: 0, g: 0.007843138, b: 0.015686275, a: 1}
   m_Intensity: 1
   m_LightVolumeIntensity: 1
   m_LightVolumeEnabled: 0
@@ -5865,6 +5868,144 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 355169909a6c2cd4d8fee38ccd86a823, type: 3}
+<<<<<<< Updated upstream:Assets/_Recovery/0 (15).unity
+=======
+--- !u!1001 &630742466
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 1279117122}
+    m_Modifications:
+    - target: {fileID: 645454510918150554, guid: 62db2e119eee1f84eb3e0b3fa54f3eee, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 0.3
+      objectReference: {fileID: 0}
+    - target: {fileID: 645454510918150554, guid: 62db2e119eee1f84eb3e0b3fa54f3eee, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 0.3
+      objectReference: {fileID: 0}
+    - target: {fileID: 645454510918150554, guid: 62db2e119eee1f84eb3e0b3fa54f3eee, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 0.3
+      objectReference: {fileID: 0}
+    - target: {fileID: 645454510918150554, guid: 62db2e119eee1f84eb3e0b3fa54f3eee, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 6.11
+      objectReference: {fileID: 0}
+    - target: {fileID: 645454510918150554, guid: 62db2e119eee1f84eb3e0b3fa54f3eee, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: -6.71
+      objectReference: {fileID: 0}
+    - target: {fileID: 645454510918150554, guid: 62db2e119eee1f84eb3e0b3fa54f3eee, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 645454510918150554, guid: 62db2e119eee1f84eb3e0b3fa54f3eee, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 645454510918150554, guid: 62db2e119eee1f84eb3e0b3fa54f3eee, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 645454510918150554, guid: 62db2e119eee1f84eb3e0b3fa54f3eee, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 645454510918150554, guid: 62db2e119eee1f84eb3e0b3fa54f3eee, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 645454510918150554, guid: 62db2e119eee1f84eb3e0b3fa54f3eee, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 645454510918150554, guid: 62db2e119eee1f84eb3e0b3fa54f3eee, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 645454510918150554, guid: 62db2e119eee1f84eb3e0b3fa54f3eee, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 180
+      objectReference: {fileID: 0}
+    - target: {fileID: 8070886004047292999, guid: 62db2e119eee1f84eb3e0b3fa54f3eee, type: 3}
+      propertyPath: m_Name
+      value: ReJumpStone (13)
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 62db2e119eee1f84eb3e0b3fa54f3eee, type: 3}
+--- !u!1001 &635856485
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 1031064733}
+    m_Modifications:
+    - target: {fileID: 1762117478111984391, guid: 355169909a6c2cd4d8fee38ccd86a823, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 1762117478111984391, guid: 355169909a6c2cd4d8fee38ccd86a823, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 35.57
+      objectReference: {fileID: 0}
+    - target: {fileID: 1762117478111984391, guid: 355169909a6c2cd4d8fee38ccd86a823, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 7.26
+      objectReference: {fileID: 0}
+    - target: {fileID: 1762117478111984391, guid: 355169909a6c2cd4d8fee38ccd86a823, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1762117478111984391, guid: 355169909a6c2cd4d8fee38ccd86a823, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1762117478111984391, guid: 355169909a6c2cd4d8fee38ccd86a823, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1762117478111984391, guid: 355169909a6c2cd4d8fee38ccd86a823, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1762117478111984391, guid: 355169909a6c2cd4d8fee38ccd86a823, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1762117478111984391, guid: 355169909a6c2cd4d8fee38ccd86a823, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1762117478111984391, guid: 355169909a6c2cd4d8fee38ccd86a823, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1762117478111984391, guid: 355169909a6c2cd4d8fee38ccd86a823, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8128606254136031303, guid: 355169909a6c2cd4d8fee38ccd86a823, type: 3}
+      propertyPath: m_Name
+      value: OneWayPlatform (6)
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 355169909a6c2cd4d8fee38ccd86a823, type: 3}
+--- !u!4 &644965434 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 645454510918150554, guid: 62db2e119eee1f84eb3e0b3fa54f3eee, type: 3}
+  m_PrefabInstance: {fileID: 1860826046}
+  m_PrefabAsset: {fileID: 0}
+>>>>>>> Stashed changes:Assets/Scenes/MainScene(Copy).unity
 --- !u!4 &660432152 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 6225515086937768451, guid: 882af805cfd446546983234da9e13de8, type: 3}
@@ -9038,6 +9179,7 @@ Tilemap:
       m_TileObjectToInstantiateIndex: 65535
       dummyAlignment: 0
       m_AllTileFlags: 1073741825
+<<<<<<< Updated upstream:Assets/_Recovery/0 (15).unity
   - first: {x: 52, y: -6, z: 0}
     second:
       serializedVersion: 2
@@ -9068,6 +9210,8 @@ Tilemap:
       m_TileObjectToInstantiateIndex: 65535
       dummyAlignment: 0
       m_AllTileFlags: 1073741825
+=======
+>>>>>>> Stashed changes:Assets/Scenes/MainScene(Copy).unity
   - first: {x: -18, y: -5, z: 0}
     second:
       serializedVersion: 2
@@ -9151,7 +9295,11 @@ Tilemap:
   m_AnimatedTiles: {}
   m_TileAssetArray:
   - serializedVersion: 2
+<<<<<<< Updated upstream:Assets/_Recovery/0 (15).unity
     m_RefCount: 272
+=======
+    m_RefCount: 173
+>>>>>>> Stashed changes:Assets/Scenes/MainScene(Copy).unity
     m_Data: {fileID: 11400000, guid: 62dc66d9fd2fe6a4a802860616b726e4, type: 2}
   - serializedVersion: 2
     m_RefCount: 2
@@ -9164,7 +9312,11 @@ Tilemap:
     m_Data: {fileID: 11400000, guid: 20bf7b62e1faa3040867103b7e50c7a3, type: 2}
   m_TileSpriteArray:
   - serializedVersion: 2
+<<<<<<< Updated upstream:Assets/_Recovery/0 (15).unity
     m_RefCount: 272
+=======
+    m_RefCount: 173
+>>>>>>> Stashed changes:Assets/Scenes/MainScene(Copy).unity
     m_Data: {fileID: 21300000, guid: 56acb33003e925246a4232d6fb804beb, type: 3}
   - serializedVersion: 2
     m_RefCount: 1
@@ -9174,7 +9326,11 @@ Tilemap:
     m_Data: {fileID: 21300000, guid: 09ab3b514ae3bb549bd189be772451bf, type: 3}
   m_TileMatrixArray:
   - serializedVersion: 2
+<<<<<<< Updated upstream:Assets/_Recovery/0 (15).unity
     m_RefCount: 279
+=======
+    m_RefCount: 180
+>>>>>>> Stashed changes:Assets/Scenes/MainScene(Copy).unity
     m_Data:
       e00: 1
       e01: 0
@@ -9194,7 +9350,11 @@ Tilemap:
       e33: 1
   m_TileColorArray:
   - serializedVersion: 2
+<<<<<<< Updated upstream:Assets/_Recovery/0 (15).unity
     m_RefCount: 279
+=======
+    m_RefCount: 180
+>>>>>>> Stashed changes:Assets/Scenes/MainScene(Copy).unity
     m_Data: {r: 1, g: 1, b: 1, a: 1}
   m_TileObjectToInstantiateArray: []
   m_AnimationFrameRate: 1
@@ -10118,6 +10278,11 @@ Transform:
 Transform:
   m_CorrespondingSourceObject: {fileID: 645454510918150554, guid: 62db2e119eee1f84eb3e0b3fa54f3eee, type: 3}
   m_PrefabInstance: {fileID: 374741977}
+  m_PrefabAsset: {fileID: 0}
+--- !u!4 &839419060 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 645454510918150554, guid: 62db2e119eee1f84eb3e0b3fa54f3eee, type: 3}
+  m_PrefabInstance: {fileID: 630742466}
   m_PrefabAsset: {fileID: 0}
 --- !u!1001 &847901785
 PrefabInstance:
@@ -11836,7 +12001,27 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6225515086937768451, guid: 882af805cfd446546983234da9e13de8, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
+<<<<<<< Updated upstream:Assets/_Recovery/0 (15).unity
       value: -90
+=======
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7520627076855677315, guid: d302d1777f0a86a4d8ab828d08c4000c, type: 3}
+      propertyPath: m_FalloffIntensity
+      value: 0.57
+      objectReference: {fileID: 0}
+    - target: {fileID: 7520627076855677315, guid: d302d1777f0a86a4d8ab828d08c4000c, type: 3}
+      propertyPath: m_PointLightInnerRadius
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7520627076855677315, guid: d302d1777f0a86a4d8ab828d08c4000c, type: 3}
+      propertyPath: m_PointLightOuterRadius
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 8844453962066615011, guid: d302d1777f0a86a4d8ab828d08c4000c, type: 3}
+      propertyPath: m_Name
+      value: TorchSet (1)
+>>>>>>> Stashed changes:Assets/Scenes/MainScene(Copy).unity
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -11976,7 +12161,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7520627076855677315, guid: d302d1777f0a86a4d8ab828d08c4000c, type: 3}
       propertyPath: m_PointLightOuterRadius
-      value: 6
+      value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 8844453962066615011, guid: d302d1777f0a86a4d8ab828d08c4000c, type: 3}
       propertyPath: m_Name
@@ -12281,12 +12466,15 @@ MonoBehaviour:
   hurtGlowIntensity: 6
   arrowDamage: 3
   arrowNoRecoverTime: 2
+<<<<<<< Updated upstream:Assets/_Recovery/0 (15).unity
   fearFire: 1
   fearPlayerFire: 0
   playerFireFearRadius: 3
   fireHitDamage: 2
   flinchKnockback: 9
   torchContinuousDamage: 0
+=======
+>>>>>>> Stashed changes:Assets/Scenes/MainScene(Copy).unity
   hitTimer: 0
 --- !u!212 &1098494022
 SpriteRenderer:
@@ -12394,6 +12582,10 @@ PrefabInstance:
     - target: {fileID: 1428607201146181822, guid: d302d1777f0a86a4d8ab828d08c4000c, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7520627076855677315, guid: d302d1777f0a86a4d8ab828d08c4000c, type: 3}
+      propertyPath: m_Intensity
+      value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 7520627076855677315, guid: d302d1777f0a86a4d8ab828d08c4000c, type: 3}
       propertyPath: m_FalloffIntensity
@@ -13093,7 +13285,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7520627076855677315, guid: d302d1777f0a86a4d8ab828d08c4000c, type: 3}
       propertyPath: m_PointLightOuterRadius
-      value: 6
+      value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 8844453962066615011, guid: d302d1777f0a86a4d8ab828d08c4000c, type: 3}
       propertyPath: m_Name
@@ -13609,7 +13801,12 @@ Transform:
   - {fileID: 1712305919}
   - {fileID: 101234850}
   - {fileID: 1934979881}
+<<<<<<< Updated upstream:Assets/_Recovery/0 (15).unity
   - {fileID: 705436861}
+=======
+  - {fileID: 839419060}
+  - {fileID: 644965434}
+>>>>>>> Stashed changes:Assets/Scenes/MainScene(Copy).unity
   - {fileID: 782535570}
   - {fileID: 121141043}
   - {fileID: 1040813818}
@@ -15059,7 +15256,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7520627076855677315, guid: d302d1777f0a86a4d8ab828d08c4000c, type: 3}
       propertyPath: m_PointLightOuterRadius
-      value: 6
+      value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 8844453962066615011, guid: d302d1777f0a86a4d8ab828d08c4000c, type: 3}
       propertyPath: m_Name
@@ -16108,7 +16305,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7520627076855677315, guid: d302d1777f0a86a4d8ab828d08c4000c, type: 3}
       propertyPath: m_PointLightOuterRadius
-      value: 6
+      value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 8844453962066615011, guid: d302d1777f0a86a4d8ab828d08c4000c, type: 3}
       propertyPath: m_Name
@@ -33101,6 +33298,16 @@ Tilemap:
       dummyAlignment: 0
       m_AllTileFlags: 1073741825
   - first: {x: 47, y: -6, z: 0}
+    second:
+      serializedVersion: 2
+      m_TileIndex: 1
+      m_TileSpriteIndex: 0
+      m_TileMatrixIndex: 0
+      m_TileColorIndex: 0
+      m_TileObjectToInstantiateIndex: 65535
+      dummyAlignment: 0
+      m_AllTileFlags: 1073741825
+  - first: {x: 52, y: -6, z: 0}
     second:
       serializedVersion: 2
       m_TileIndex: 1
@@ -53789,7 +53996,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7520627076855677315, guid: d302d1777f0a86a4d8ab828d08c4000c, type: 3}
       propertyPath: m_PointLightOuterRadius
-      value: 6
+      value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 8844453962066615011, guid: d302d1777f0a86a4d8ab828d08c4000c, type: 3}
       propertyPath: m_Name
@@ -55359,7 +55566,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7520627076855677315, guid: d302d1777f0a86a4d8ab828d08c4000c, type: 3}
       propertyPath: m_PointLightOuterRadius
-      value: 6
+      value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 8844453962066615011, guid: d302d1777f0a86a4d8ab828d08c4000c, type: 3}
       propertyPath: m_Name
@@ -56360,6 +56567,21 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+<<<<<<< Updated upstream:Assets/_Recovery/0 (15).unity
+=======
+    - target: {fileID: 7520627076855677315, guid: d302d1777f0a86a4d8ab828d08c4000c, type: 3}
+      propertyPath: m_FalloffIntensity
+      value: 0.57
+      objectReference: {fileID: 0}
+    - target: {fileID: 7520627076855677315, guid: d302d1777f0a86a4d8ab828d08c4000c, type: 3}
+      propertyPath: m_PointLightOuterRadius
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 8844453962066615011, guid: d302d1777f0a86a4d8ab828d08c4000c, type: 3}
+      propertyPath: m_Name
+      value: TorchSet
+      objectReference: {fileID: 0}
+>>>>>>> Stashed changes:Assets/Scenes/MainScene(Copy).unity
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
