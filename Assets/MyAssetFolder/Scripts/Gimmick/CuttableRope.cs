@@ -5,6 +5,14 @@ public class CuttableRope : MonoBehaviour, IIgnitable
     [Header("箱を吊るしているジョイント（箱についているHingeJoint2Dなど）")]
     [SerializeField] private Joint2D boxJoint;
 
+    public AudioClip cutRopeSound;
+    private AudioSource audioSource;
+
+    void Start()
+    {
+        audioSource = GetComponent<AudioSource>();
+    }
+
     // 🌟 プレイヤーが綱の当たり判定（トリガー）に触れたときの処理
     private void OnTriggerStay2D(Collider2D collision)
     {
@@ -33,7 +41,7 @@ public class CuttableRope : MonoBehaviour, IIgnitable
         {
             boxJoint.enabled = false;
         }
-
+        audioSource.PlayOneShot(cutRopeSound);
         // 2. 綱（このオブジェクト自身）をゲーム画面から完全に消す
         gameObject.SetActive(false);
 

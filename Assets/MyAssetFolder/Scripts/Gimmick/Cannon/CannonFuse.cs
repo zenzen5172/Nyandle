@@ -30,6 +30,7 @@ public class CannonFuse : MonoBehaviour, IIgnitable
     private SpriteRenderer mySprite;
     private AudioSource audioSource;
     public AudioClip fuseSound;
+    public AudioClip igniteFuseSound;
 
     void Start()
     {
@@ -151,6 +152,7 @@ public class CannonFuse : MonoBehaviour, IIgnitable
 
         if (fuseSound != null && audioSource != null)
         {
+            audioSource.PlayOneShot(igniteFuseSound);
             audioSource.clip = fuseSound;
             audioSource.loop = true;
             audioSource.Play();
