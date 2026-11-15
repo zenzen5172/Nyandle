@@ -13,6 +13,7 @@ GameObject:
   - component: {fileID: 6784932525998479601}
   - component: {fileID: 8567294648051410643}
   - component: {fileID: 8134157111047286489}
+  - component: {fileID: 8125718095014723491}
   m_Layer: 6
   m_Name: WoodBoxOnly
   m_TagString: Box
@@ -131,7 +132,7 @@ BoxCollider2D:
   m_Enabled: 1
   serializedVersion: 3
   m_Density: 1
-  m_Material: {fileID: 0}
+  m_Material: {fileID: 6200000, guid: dd5df1eb770b0f18c9b46fe1bc84cd67, type: 2}
   m_IncludeLayers:
     serializedVersion: 2
     m_Bits: 0
@@ -193,3 +194,18 @@ HingeJoint2D:
   m_AngleLimits:
     m_LowerAngle: 0
     m_UpperAngle: 359
+--- !u!114 &8125718095014723491
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6892759410675839268}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b2c0437852f841ada0a262be330ba9f2, type: 3}
+  m_Name:
+  m_EditorClassIdentifier: Assembly-CSharp::BurnableWoodBox
+  burnDuration: 1.5
+  flameSprite: {fileID: 21300000, guid: c439b5dee5d731747bb39e6e2ac0b413, type: 3}
+  flameMaterial: {fileID: 2100000, guid: 9dfc825aed78fcd4ba02077103263b40, type: 2}

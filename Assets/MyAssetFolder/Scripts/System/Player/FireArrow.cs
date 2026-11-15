@@ -37,7 +37,17 @@ public class FireArrow : MonoBehaviour
 
     public void SetOwner(GameObject ownerObject)
     {
+        if (owner == null) Player.OnRespawn += RemoveOnRespawn;
         owner = ownerObject;
+    }
+
+    void OnDestroy() => Player.OnRespawn -= RemoveOnRespawn;
+
+    void RemoveOnRespawn()
+    {
+        isFinished = true;
+        gameObject.SetActive(false);
+        Destroy(gameObject);
     }
 
     void FixedUpdate()
@@ -55,7 +65,7 @@ public class FireArrow : MonoBehaviour
             Vector2 v = rb.linearVelocity;
             if (v.sqrMagnitude > 0.01f)
             {
-                rb.MoveRotation(Mathf.Atan2(v.y, v.x) * Mathf.Rad2Deg);
+                rb.MoveRotation(AngleForDirection(v));
             }
         }
     }
@@ -66,8 +76,7 @@ public class FireArrow : MonoBehaviour
         float distance = delta.magnitude;
         if (distance < 0.0001f) return;
 
-        var filter = new ContactFilter2D();
-        filter.NoFilter();
+        var filter = ContactFilter2D.noFilter;
         filter.useTriggers = true;
         sweepHits.Clear();
         Physics2D.Raycast(from, delta / distance, filter, sweepHits, distance);
@@ -98,6 +107,12 @@ public class FireArrow : MonoBehaviour
         if (IsOwner(other)) return;
         if (other.GetComponentInParent<FireArrow>() != null) return;   // 矢同士は無視
 
+        if (owner != null && owner.TryGetComponent(out Player player) && player.CanBurnWoodBoxes
+            && other.TryGetComponent(out BurnableWoodBox woodBox))
+        {
+            woodBox.Ignite();
+        }
+
         // 火に反応するもの（松明・導火線・綱・コウモリ）
         // 親までさかのぼるのはトリガー（導火線の着火判定の子オブジェクトなど）のときだけ。
         // 振り子の箱のように「綱の子にある固い物」に当たっても綱が切れないようにする
@@ -108,7 +123,7 @@ public class FireArrow : MonoBehaviour
         {
             ignitable.Ignite(gameObject);
 
-            // コウモリに当たった矢はそこで消える。それ以外（綱・導火線・松明）は貫通して飛び続ける
+            // コウモリは矢を消費し、綱・導火線などは貫通する。
             if (ignitable is BatEnemy)
             {
                 isFinished = true;
@@ -124,6 +139,9 @@ public class FireArrow : MonoBehaviour
             Stick(hitPoint);
         }
     }
+
+    // 矢のスプライト（火の矢.png）とコライダーの先端はローカル座標の +X を向く。
+    internal static float AngleForDirection(Vector2 direction) => Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
 
     static bool IsOneWayPlatform(Collider2D other)
     {

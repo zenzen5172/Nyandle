@@ -565,54 +565,6 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0, y: 0}
---- !u!1 &1160111485
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1160111486}
-  - component: {fileID: 1160111487}
-  m_Layer: 0
-  m_Name: TitleSceneManager
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &1160111486
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1160111485}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -3.83252, y: 273.4605, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1160111487
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1160111485}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0d8bea033e7f4f14497d9c06945380b5, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::TitleScene
-  startBtn: {fileID: 1531613638}
-  nextScene: MainScene
-  isBtnPressed: 0
-  isBtnReleased: 0
 --- !u!1 &1465924265
 GameObject:
   m_ObjectHideFlags: 0
@@ -805,7 +757,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1531613639}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 1531613642}
+        m_TargetAssemblyTypeName: TitleSceneManager, Assembly-CSharp
+        m_MethodName: StartSceneBtn
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument:
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &1531613639
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -876,10 +840,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0d8bea033e7f4f14497d9c06945380b5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::TitleSceneManager
-  startBtn: {fileID: 1531613638}
   nextScene: MainScene
-  isBtnPressed: 0
-  isBtnReleased: 0
 --- !u!1 &1657945105
 GameObject:
   m_ObjectHideFlags: 0
@@ -1154,4 +1115,3 @@ SceneRoots:
   - {fileID: 577789701}
   - {fileID: 431033719}
   - {fileID: 1657945107}
-  - {fileID: 1160111486}

@@ -18,7 +18,9 @@ public class PlayerStarter : MonoBehaviour
     // 初期スポーン用
     void Start()
     {
-        transform.position = new Vector2(spawnX, spawnY);
+        Vector2 spawnPoint = new Vector2(spawnX, spawnY);
+        transform.position = new Vector3(spawnX, spawnY, transform.position.z);
+        if (TryGetComponent(out Player player)) player.respawnPoint = spawnPoint;
     }
 
     void OnSceneLoaded(Scene scene, LoadSceneMode mode)
