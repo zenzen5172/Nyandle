@@ -279,6 +279,7 @@ public class Player : MonoBehaviour
     {
         CancelInvoke(nameof(Respawn));
         ClearCannonEntry();
+        DetachFromMovingPlatform();
 
         transform.position = new Vector3(respawnPoint.x, respawnPoint.y, transform.position.z);
         rb.position = respawnPoint;
@@ -586,8 +587,8 @@ public class Player : MonoBehaviour
     {
         if (arrowPrefab == null) return;
 
-        float worldAngle = Mathf.Atan2(dir.y, dir.x) * Mathf.Rad2Deg;
-        GameObject firedArrow = Instantiate(arrowPrefab, spawnPos, Quaternion.Euler(0f, 0f, worldAngle));
+        Vector3 position = new Vector3(spawnPos.x, spawnPos.y, transform.position.z);
+        GameObject firedArrow = Instantiate(arrowPrefab, position, Quaternion.Euler(0f, 0f, FireArrow.AngleForDirection(dir)));
 
         // 火の矢の当たり判定（松明・コウモリ・導火線・綱）。プレハブに付いていなければ自動で付ける
         FireArrow fireArrow = firedArrow.GetComponent<FireArrow>();

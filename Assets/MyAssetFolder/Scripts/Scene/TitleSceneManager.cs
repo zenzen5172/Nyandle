@@ -1,58 +1,24 @@
 using UnityEngine;
 using UnityEngine.SceneManagement;
-using UnityEngine.UI;
-using UnityEngine.EventSystems;
-using Unity.VisualScripting;
-using UnityEngine.Assemblies;
+using UnityEngine.InputSystem;
 
-public class TitleSceneManager: MonoBehaviour, IPointerDownHandler, IPointerUpHandler
+public class TitleSceneManager : MonoBehaviour
 {
-    [Header("参照")]
-    [SerializeField] private Button startBtn;
-
     [Header("遷移先")]
     [SerializeField] private string nextScene = "MainScene";
 
-    //呼び出し
-    private Image startBtnImage;
-    private Color btnColor;
-    private bool isSpacePressed = false;
-    [SerializeField] private bool isBtnPressed = false;
-    [SerializeField] private bool isBtnReleased = false;
-
-    void Start()
-    {
-        startBtn = GetComponent<Button>();
-        startBtnImage = GetComponent<Image>();
-        btnColor = startBtnImage.color;
-    }
-
+    private bool isLoading;
 
     void Update()
     {
-        if (Input.GetKey(KeyCode.Space))
-        {
-            startBtnImage.color = Color.black;
-            isBtnPressed = true;
-            isBtnReleased = true;
-            SceneManager.LoadScene(nextScene);
-        }
+        if (Keyboard.current?.spaceKey.wasPressedThisFrame == true) StartSceneBtn();
     }
 
-    // マウスクリックの処理
-    public void OnPointerDown(PointerEventData eventData)
+    public void StartSceneBtn()
     {
-        if (startBtnImage != null)
-        {
-            startBtnImage.color = Color.black;
-            isBtnPressed = true;
+        if (isLoading) return;
 
-        }
-    }
-    public void OnPointerUp(PointerEventData eventData)
-    {
-        isBtnPressed = false;
-        isBtnReleased = true;
-        SceneManager.LoadScene(nextScene);
+        isLoading = true;
+        SceneManager.LoadSceneAsync(nextScene);
     }
 }
