@@ -42,7 +42,7 @@ public class Opening : MonoBehaviour
         }
 
         // 修正2: countが2以下の時はOpeningChange、3以上の時はSceneChangeを呼ぶように分岐
-        if (openingCount > 2)
+        if (openingCount >= 2)
         {
             SceneChange();
         }

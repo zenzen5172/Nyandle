@@ -28,6 +28,7 @@ public class Player : MonoBehaviour
 
     [Header("大砲に関する行動制限")]
     public bool canControl = true;
+    public bool canControlForever = false;
     public bool isLaunched = false;
     public float launchAirControl = 20f;   // 大砲で飛ばされている間、左右入力で速度を変えられる加速度（小さいほど慣性が残る）
     public bool addJumpToLaunch = false;   // true: 発射の上向きの勢いにジャンプ力を足す / false: 勢いとジャンプ力の大きい方を使う
@@ -54,7 +55,7 @@ public class Player : MonoBehaviour
     [Header("リスポーン直後の操作不能時間（秒）")]
     public float respawnControlLockTime = 0.3f;
     float controlLockTimer;
-    bool IsInputLocked => controlLockTimer > 0f || AllOverCameraManeger.IsActive; // 俯瞰カメラ中も操作不可
+    bool IsInputLocked => canControlForever || controlLockTimer > 0f || AllOverCameraManeger.IsActive; // 俯瞰カメラ中も操作不可
     Cannon currentCannon;
     Vector3 cannonEntryScale;
     float launchControlTimer;
@@ -395,7 +396,7 @@ public class Player : MonoBehaviour
     void Update()
     {
         var kb = Keyboard.current;
-        if (kb != null && !AllOverCameraManeger.IsActive && kb.rKey.wasPressedThisFrame)
+        if (kb != null && !AllOverCameraManeger.IsActive && kb.rKey.wasPressedThisFrame && !canControlForever)
         {
             Respawn();
             return;
