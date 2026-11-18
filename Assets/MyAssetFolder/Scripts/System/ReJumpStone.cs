@@ -6,7 +6,8 @@ public class ReJumpStone : MonoBehaviour
     private SpriteRenderer sr;
     private Collider2D col;
     private Player playerRef;
-    private Color stoneColor;
+    [SerializeField] private Color stoneColor;
+    [SerializeField] private Color cantGetColor;
     private AudioSource audioSource;
 
     public AudioClip rejumpSound;
@@ -41,7 +42,7 @@ public class ReJumpStone : MonoBehaviour
                 player.jumpable = true;
 
                 // 地面についたら再表示するように
-                sr.color = Color.gray;
+                sr.color = cantGetColor;
                 col.enabled = false;
 
                 playerRef = player;

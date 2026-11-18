@@ -298,7 +298,7 @@ public class Player : MonoBehaviour
         jumpCount = maxJumpCount;
         groundJumpSpent = false;
 
-        jumpable = false;
+        //jumpable = false; //リスポーンとジャンプを組み合わせたコースを作るためにOFFにしました
         canControl = true;
         isLaunched = false;
         launchControlTimer = 0f;

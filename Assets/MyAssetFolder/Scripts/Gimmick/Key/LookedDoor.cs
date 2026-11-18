@@ -26,8 +26,14 @@ public class LockedDoor : MonoBehaviour
                     Destroy(inventory.currentKey); // 鍵を消す
                 }
                 if (unLockedSound != null && audioSource != null)
-                audioSource.PlayOneShot(unLockedSound);
-                Destroy(gameObject); // 扉自体を消す
+                {
+                    audioSource.PlayOneShot(unLockedSound);
+                }
+                GetComponent<SpriteRenderer>().enabled = false;
+                GetComponent<Collider2D>().enabled = false;
+                float destroyDeray = unLockedSound != null ? unLockedSound.length : 0f;
+
+                Destroy(gameObject, destroyDeray); // 扉自体を消す
             }
         }
     }

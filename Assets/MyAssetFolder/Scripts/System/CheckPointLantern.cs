@@ -1,21 +1,31 @@
 using UnityEngine;
+using UnityEngine.Rendering.Universal;
 
 public class CheckPointLantern : MonoBehaviour
 {
     private static CheckPointLantern currentActive;
 
     private SpriteRenderer sr;
-    private Color originalColor;
+    [SerializeField] private Color originalColor;
+    [SerializeField] private Color lightColor;
     private AudioSource audioSource;
     public AudioClip checkSound;
+
+    private Transform lightObject = null; 
 
 
     private void Start()
     {
         sr = GetComponent<SpriteRenderer>();
         audioSource = GetComponent<AudioSource>();
-        sr.color = Color.gray;
-        originalColor = sr.color;
+        sr.color = originalColor;
+
+        if (transform.childCount > 0)
+        {
+            lightObject = transform.GetChild(0);
+        }
+
+        lightObject.gameObject.SetActive(false);
     }
 
     private void OnTriggerEnter2D(Collider2D collision)
@@ -38,7 +48,8 @@ public class CheckPointLantern : MonoBehaviour
                     audioSource.PlayOneShot(checkSound);
                 }
                 currentActive = this;
-                sr.color = Color.yellowGreen;
+                lightObject.gameObject.SetActive(true);
+                sr.color = lightColor;
             }
         }
     } 
@@ -47,6 +58,7 @@ public class CheckPointLantern : MonoBehaviour
     {
         if (sr != null)
         {
+            lightObject.gameObject.SetActive(false);
             sr.color = originalColor;
         }
     }

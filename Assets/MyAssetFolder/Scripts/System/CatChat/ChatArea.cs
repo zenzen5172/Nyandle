@@ -8,7 +8,7 @@ public class ChatArea : MonoBehaviour
     [SerializeField] private bool willVanish = false;
     [SerializeField] private float vanishTime = 0f;
 
-    // ★追加: プレイヤーが現在このエリア内にいるかどうかを記録するフラグ
+    // プレイヤーが現在このエリア内にいるかどうかを記録するフラグ
     private bool isPlayerInside = false;
 
     void Start()
@@ -20,10 +20,13 @@ public class ChatArea : MonoBehaviour
     {
         if (other.CompareTag("Player"))
         {
-            isPlayerInside = true; // ★エリアに入ったことを記録
-
-            catChat.ShowText(text);
-            catChat.colliderCount++;
+            // 大砲から発射されて物理演算が復活した際の2重カウントを防止
+            if (!isPlayerInside)
+            {
+                isPlayerInside = true;
+                catChat.ShowText(text);
+                catChat.colliderCount++;
+            }
         }
     }
 
@@ -31,19 +34,38 @@ public class ChatArea : MonoBehaviour
     {
         if (other.CompareTag("Player"))
         {
-            isPlayerInside = false; // ★エリアから出たことを記録
+            Player player = other.GetComponent<Player>();
+            Rigidbody2D rb = other.GetComponent<Rigidbody2D>();
 
-            catChat.HideText();
-            catChat.colliderCount--;
-            if (catChat.colliderCount <= 0)
+            // プレイヤーの物理演算がオフになったことによる強制Exitかチェック
+            if (player != null && rb != null && !rb.simulated)
             {
-                catChat.colliderCount = 0;
-            }
-        }
+                // ★大砲に入った時は「生きてる」ので、Exit処理をキャンセルしてテキストを残す
+                if (!player.IsDead)
+                {
+                    return;
+                }
 
-        if (willVanish == true)
-        {
-            Destroy(gameObject, vanishTime);
+                // ★死亡した時は「死んでる」ので、そのまま下の処理に進んでテキストを消す
+            }
+
+            // 本当にエリアから出た、または「死亡した」場合のみ処理する
+            if (isPlayerInside)
+            {
+                isPlayerInside = false;
+                catChat.HideText();
+                catChat.colliderCount--;
+
+                if (catChat.colliderCount <= 0)
+                {
+                    catChat.colliderCount = 0;
+                }
+
+                if (willVanish == true)
+                {
+                    Destroy(gameObject, vanishTime);
+                }
+            }
         }
     }
 

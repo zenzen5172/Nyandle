@@ -6,6 +6,7 @@ public class IgnoreFire : MonoBehaviour, IIgnitable
     public GameObject fire;
     public AudioClip ignoreSound;
     private AudioSource audioSource;
+    private bool isIgnite = false;
 
     [Header("コウモリが火に突っ込むと「熱っ！」と怯む")]
     public bool damageBats = true;
@@ -32,18 +33,23 @@ public class IgnoreFire : MonoBehaviour, IIgnitable
         if (fire != null)
         {
             fire.SetActive(false);
+
         }
     }
+    
 
    void OnTriggerEnter2D(Collider2D collision)
     {
-        if (collision.CompareTag("Player"))
+        if (!isIgnite)
         {
-            if (fire != null)
+            if (collision.CompareTag("Player"))
             {
-                fire.SetActive(true);
-                audioSource.PlayOneShot(ignoreSound);
-
+                if (fire != null)
+                {
+                    fire.SetActive(true);
+                    audioSource.PlayOneShot(ignoreSound);
+                    isIgnite = true;
+                }
             }
         }
     }
@@ -51,10 +57,14 @@ public class IgnoreFire : MonoBehaviour, IIgnitable
     // 火の矢が当たったときも着火する
     public void Ignite(GameObject source)
     {
-        if (fire != null)
+        if (!isIgnite)
         {
-            fire.SetActive(true);
-            audioSource.PlayOneShot(ignoreSound);
+            if(fire != null)
+        {
+                fire.SetActive(true);
+                audioSource.PlayOneShot(ignoreSound);
+                isIgnite = true;
+            }
         }
     }
 

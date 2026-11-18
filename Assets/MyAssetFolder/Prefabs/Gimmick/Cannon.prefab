@@ -176,6 +176,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Cannon
   cannonPoint: {fileID: 1891051412811937756}
   cannonDirection: {x: 5, y: 1}
+  entryDuration: 0.35
   strongPower: 20
   weakPower: 5
   stunDuration: 1
