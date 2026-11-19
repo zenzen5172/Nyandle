@@ -1,7 +1,7 @@
 using UnityEngine;
-using UnityEngine.SceneManagement; // シーン遷移に必要
-using UnityEngine.UI;              // UI(Image)の操作に必要
-using System.Collections;          // コルーチン(IEnumerator)に必要
+using UnityEngine.SceneManagement;
+using UnityEngine.UI;
+using System.Collections;
 
 public class Elevator : MonoBehaviour
 {
@@ -15,9 +15,9 @@ public class Elevator : MonoBehaviour
     [SerializeField] private Vector2 endingTargetPosition;
 
     [Header("シーン遷移・フェード")]
-    [SerializeField] private Image fadeImage; // 画面を覆う真っ黒なUI画像
-    [SerializeField] private float fadeDuration = 1.5f; // 暗くなるまでの秒数
-    [SerializeField] private string nextSceneName = "TitleScene"; // 戻るシーン名
+    [SerializeField] private Image fadeImage;
+    [SerializeField] private float fadeDuration = 1.5f;
+    [SerializeField] private string nextSceneName = "TitleScene";
 
     [Header("状態フラグ")]
     public bool isOpening = true;
@@ -30,6 +30,9 @@ public class Elevator : MonoBehaviour
     [SerializeField] private AudioClip elevatorSound;
     public AudioSource audioSource;
 
+    private Rigidbody2D playerRb;
+    private Player playerScript;
+
     void Start()
     {
         transform.position = new Vector2(elevatorX, elevatorY);
@@ -41,7 +44,6 @@ public class Elevator : MonoBehaviour
         }
         audioSource.Stop();
 
-        // 最初はフェード画像を透明（見えない状態）にしておく
         if (fadeImage != null)
         {
             fadeImage.gameObject.SetActive(false);
@@ -51,7 +53,14 @@ public class Elevator : MonoBehaviour
         }
     }
 
+    // ★ 変更：Update にあった移動処理をなくしました
     void Update()
+    {
+        // アニメーションや入力などがあればここに書きますが、移動処理は書きません
+    }
+
+    // ★ 変更：物理演算と同じタイミングでエレベーターを動かします
+    void FixedUpdate()
     {
         if (isOpening)
         {
@@ -76,40 +85,35 @@ public class Elevator : MonoBehaviour
     {
         MoveElevator(endingTargetPosition, () =>
         {
-            isEnding = false; // 移動終了
+            isEnding = false;
 
-            // フェードアウトとシーン遷移を開始
             if (fadeImage != null)
             {
                 StartCoroutine(FadeOutAndChangeScene());
             }
             else
             {
-                // 画像が設定されていない場合は即座に遷移
                 SceneManager.LoadScene(nextSceneName);
             }
         });
     }
 
-    // 画面を徐々に暗くして、完了したらシーンを読み込む処理
     private IEnumerator FadeOutAndChangeScene()
     {
         fadeImage.gameObject.SetActive(true);
         Color color = fadeImage.color;
-        color = Color.black; // 色を黒に固定
+        color = Color.black;
         color.a = 0f;
         float timer = 0f;
 
-        // 指定した秒数(fadeDuration)かけて透明度(a)を1にしていく
         while (timer < fadeDuration)
         {
             timer += Time.deltaTime;
             color.a = Mathf.Clamp01(timer / fadeDuration);
             fadeImage.color = color;
-            yield return null; // 1フレーム待つ
+            yield return null;
         }
 
-        // 完全に暗くなったらシーンを移動
         SceneManager.LoadScene(nextSceneName);
     }
 
@@ -122,10 +126,11 @@ public class Elevator : MonoBehaviour
             movingSwitch = false;
         }
 
+        // ★変更：FixedUpdate で動かすため、Time.deltaTime ではなく Time.fixedDeltaTime を使用します
         transform.position = Vector2.MoveTowards(
             transform.position,
             target,
-            moveSpeed * Time.deltaTime
+            moveSpeed * Time.fixedDeltaTime
         );
 
         if (Vector2.Distance(transform.position, target) < 0.01f)
@@ -142,6 +147,8 @@ public class Elevator : MonoBehaviour
         if (collision.gameObject.CompareTag("Player"))
         {
             collision.transform.SetParent(transform);
+            playerRb = collision.GetComponent<Rigidbody2D>();
+            playerScript = collision.GetComponent<Player>();
         }
     }
 
@@ -150,6 +157,12 @@ public class Elevator : MonoBehaviour
         if (collision.gameObject.CompareTag("Player"))
         {
             collision.transform.SetParent(null);
+
+            if (playerRb != null && collision.gameObject == playerRb.gameObject)
+            {
+                playerRb = null;
+                playerScript = null;
+            }
         }
     }
 }

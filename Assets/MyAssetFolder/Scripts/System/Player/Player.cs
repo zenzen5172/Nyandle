@@ -77,7 +77,7 @@ public class Player : MonoBehaviour
 
     float jumpBuffer;
     float coyoteTimer;
-    bool isGrounded;
+    public bool isGrounded;
     public bool isGround => isGrounded;
 
     bool isRising;    // 自分のジャンプで上昇中か
