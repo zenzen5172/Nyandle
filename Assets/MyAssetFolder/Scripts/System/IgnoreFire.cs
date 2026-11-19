@@ -6,6 +6,7 @@ public class IgnoreFire : MonoBehaviour, IIgnitable
     public GameObject fire;
     public AudioClip ignoreSound;
     private AudioSource audioSource;
+    private SpriteRenderer spriteRenderer;
     private bool isIgnite = false;
 
     [Header("コウモリが火に突っ込むと「熱っ！」と怯む")]
@@ -29,6 +30,9 @@ public class IgnoreFire : MonoBehaviour, IIgnitable
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
+        spriteRenderer = GetComponent<SpriteRenderer>();
+        spriteRenderer.enabled = true;
+
         audioSource = GetComponent<AudioSource>();
         if (fire != null)
         {
@@ -50,6 +54,8 @@ public class IgnoreFire : MonoBehaviour, IIgnitable
                     audioSource.PlayOneShot(ignoreSound);
                     isIgnite = true;
                 }
+
+                spriteRenderer.enabled = false;
             }
         }
     }
@@ -65,6 +71,8 @@ public class IgnoreFire : MonoBehaviour, IIgnitable
                 audioSource.PlayOneShot(ignoreSound);
                 isIgnite = true;
             }
+
+            spriteRenderer.enabled = false;
         }
     }
 
