@@ -31,7 +31,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 118.45, y: -25.9, z: 0}
-  m_LocalScale: {x: 1, y: 0.21945314, z: 1}
+  m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
@@ -82,14 +82,14 @@ SpriteRenderer:
   m_LightmapParameters: {fileID: 0}
   m_GlobalIlluminationMeshLod: 0
   m_SortingLayerID: 461272777
-  m_SortingLayer: 3
+  m_SortingLayer: 4
   m_SortingOrder: 0
   m_MaskInteraction: 0
-  m_Sprite: {fileID: 7482667652216324306, guid: 311925a002f4447b3a28927169b83ea6, type: 3}
+  m_Sprite: {fileID: 21300000, guid: c94d9c26c815430448a8c9e9425dba1d, type: 3}
   m_Color: {r: 0.502331, g: 1, b: 0.25, a: 1}
   m_FlipX: 0
   m_FlipY: 0
-  m_DrawMode: 0
+  m_DrawMode: 2
   m_Size: {x: 1, y: 1}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
@@ -107,11 +107,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 53c0480658e5203418c6576b9fbf3476, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DownBlock
-  dropTime: 0
-  respawnTime: 0
-  steppedTimer: 0
   touchedTime: 0
+  dropTime: 0
+  hideTime: 1.5
+  respawnTime: 0
   touchedTimer: 0
+  steppedTimer: 0
+  respawnTimer: 0
   isActivated: 0
   isDropped: 0
 --- !u!61 &6060934625765050293
@@ -155,7 +157,7 @@ BoxCollider2D:
     oldSize: {x: 1, y: 1}
     newSize: {x: 1, y: 1}
     adaptiveTilingThreshold: 0.5
-    drawMode: 0
+    drawMode: 2
     adaptiveTiling: 0
   m_AutoTiling: 0
   m_Size: {x: 1, y: 1}
