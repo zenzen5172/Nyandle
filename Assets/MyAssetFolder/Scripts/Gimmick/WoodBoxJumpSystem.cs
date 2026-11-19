@@ -24,6 +24,7 @@ public class WoodBoxJumpSystem : MonoBehaviour
     float boxAngle;
     readonly List<RaycastHit2D> wallHits = new();
     readonly List<Collider2D> headHits = new();
+    readonly List<Joint2D> boxJoints = new();
     ContactFilter2D wallFilter;
     Vector2 previousPosition;
     float contactHeight;
@@ -148,6 +149,7 @@ public class WoodBoxJumpSystem : MonoBehaviour
             if (box == null || box == playerBody || !box.simulated) continue;
             if (ignoreReleasedBox && box == releasedBox) continue;
             if (boxCollider.usedByEffector || !box.TryGetComponent<BurnableWoodBox>(out _)) continue;
+            if (HasActiveJoint(box)) continue;
 
             // 箱が頭の真上にかかっていて、頭頂にほぼ接しているものだけを掴む。
             Bounds boxBounds = boxCollider.bounds;
@@ -167,6 +169,7 @@ public class WoodBoxJumpSystem : MonoBehaviour
     bool CarryBox(Rigidbody2D box, BoxCollider2D boxCollider)
     {
         if (carriedBox != null || box == null || boxCollider == null || !box.simulated) return false;
+        if (HasActiveJoint(box)) return false;
 
         SpriteRenderer renderer = box.GetComponent<SpriteRenderer>();
         if (renderer == null || !renderer.enabled) return false;
@@ -186,6 +189,16 @@ public class WoodBoxJumpSystem : MonoBehaviour
         box.angularVelocity = 0f;
         box.simulated = false;
         return true;
+    }
+
+    // ロープなどで吊られている間は、頭で運ぶために物理演算を止めない。
+    // 切断されてジョイントが無効になった箱は、通常どおり運べる。
+    bool HasActiveJoint(Rigidbody2D box)
+    {
+        box.GetComponents(boxJoints);
+        foreach (Joint2D joint in boxJoints)
+            if (joint.isActiveAndEnabled) return true;
+        return false;
     }
 
     void OnCollisionEnter2D(Collision2D collision) => TryCarryFromCollision(collision);

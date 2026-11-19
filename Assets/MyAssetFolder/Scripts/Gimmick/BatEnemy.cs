@@ -72,6 +72,9 @@ public class BatEnemy : MonoBehaviour, IIgnitable
     private Vector2 diveStart;
     private Vector2 homePosition;   // 戻る先（天井）
     private Transform currentCeilingPoint;
+    private Transform departureCeilingPoint;
+    private Vector2 departurePosition;
+    private bool isTurningBack;
 
     // 実際に飛んだ軌跡（Sceneビューに表示する用）
     private readonly Queue<Vector3> trail = new Queue<Vector3>();
@@ -218,18 +221,35 @@ public class BatEnemy : MonoBehaviour, IIgnitable
 
     private void FlyHome(Transform perch)
     {
+        SetState(State.Returning);
         if (perch != null)
         {
             currentCeilingPoint = perch;
             homePosition = perch.position;
         }
-        SetState(State.Returning);
     }
 
     private void SetState(State next)
     {
+        if (currentState == State.Perched && next != State.Perched)
+        {
+            departureCeilingPoint = currentCeilingPoint;
+            departurePosition = homePosition;
+        }
+        if (next == State.Perched) isTurningBack = false;
         currentState = next;
         stateTimer = 0f;
+    }
+
+    // 引き返し用Triggerに触れたら、攻撃をやめて飛び立った天井へ戻る。
+    public void TurnBack()
+    {
+        if (!isActiveAndEnabled || currentState == State.Perched || isTurningBack) return;
+
+        isTurningBack = true;
+        velocity = -velocity;
+        FlyHome(departureCeilingPoint);
+        homePosition = departureCeilingPoint != null ? (Vector2)departureCeilingPoint.position : departurePosition;
     }
 
     // ===== 火 =====
