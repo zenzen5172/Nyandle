@@ -49,6 +49,12 @@ TagManager:
   - name: BackGround
     uniqueID: 3791343813
     locked: 0
+  - name: BackGround_Stone
+    uniqueID: 1447859597
+    locked: 0
+  - name: BackGround_manyStone
+    uniqueID: 2618949031
+    locked: 0
   - name: BlackScreen_Z
     uniqueID: 3704763259
     locked: 0

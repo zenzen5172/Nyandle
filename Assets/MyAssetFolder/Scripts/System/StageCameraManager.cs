@@ -1,4 +1,6 @@
+using NUnit.Framework;
 using UnityEngine;
+using System.Collections.Generic;
 
 public class StageCameraManager : MonoBehaviour
 {
@@ -12,11 +14,19 @@ public class StageCameraManager : MonoBehaviour
     [Header("カメラ移動速度")]
     [SerializeField] private float moveSpeed = 0f;
 
+    [SerializeField] private GameObject backGround;
+    [SerializeField] private List<GameObject> stones = new List<GameObject>();
+
+
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
-        
+        foreach (GameObject stone in stones)
+        {
+            stone.gameObject.SetActive(false);
+        }
+
     }
 
     // Update is called once per frame

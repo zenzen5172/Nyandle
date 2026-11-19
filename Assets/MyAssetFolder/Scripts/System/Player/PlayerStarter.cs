@@ -3,10 +3,11 @@ using UnityEngine.SceneManagement;
 
 public class PlayerStarter : MonoBehaviour
 {
+    [SerializeField] private bool spawnStartPoint = true;
     private void Awake()
     {
 #if UNITY_EDITOR
-        this.enabled = false;
+        this.enabled = spawnStartPoint;
 #else
         this.enabled = true; //UnityEditor起動中のため、灰色でOK
 #endif
