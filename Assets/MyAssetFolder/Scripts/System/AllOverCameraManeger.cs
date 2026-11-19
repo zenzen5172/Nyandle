@@ -36,6 +36,8 @@ public class AllOverCameraManeger : MonoBehaviour
     [SerializeField] private Vector2 boundsMin = new Vector2(-10f, -40f);
     [SerializeField] private Vector2 boundsMax = new Vector2(150f, 10f);
 
+    [SerializeField] private GameObject blackScreen;
+
     private float normalSize;
     private Vector3 normalPosition;
     private float zoomTimer;
@@ -53,6 +55,8 @@ public class AllOverCameraManeger : MonoBehaviour
             stageCamera = targetCamera.GetComponent<StageCameraManager>();
         IsActive = false;
         zoomTimer = zoomDuration; // 開始時はズームアニメーションを再生しない（サイズが0になるのを防ぐ）
+
+        blackScreen.gameObject.SetActive(false);
     }
 
     void OnDisable()
@@ -69,6 +73,8 @@ public class AllOverCameraManeger : MonoBehaviour
         {
             if (overviewOn) EndOverview(instant: false);
             else if (!returning) BeginOverview();
+
+            
         }
 
         // 時間を止めても動くように unscaledDeltaTime を使う
@@ -133,6 +139,8 @@ public class AllOverCameraManeger : MonoBehaviour
 
     private void BeginOverview()
     {
+        blackScreen.gameObject.SetActive(true);
+
         IsActive = true;
         overviewOn = true;
         normalSize = targetCamera.orthographicSize;
@@ -156,6 +164,8 @@ public class AllOverCameraManeger : MonoBehaviour
 
     private void EndOverview(bool instant)
     {
+        blackScreen.gameObject.SetActive(false);
+
         overviewOn = false;
         returning = true;
         StartZoom(normalSize);
