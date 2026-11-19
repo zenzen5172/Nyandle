@@ -16,7 +16,8 @@ public class Elevator : MonoBehaviour
 
     [Header("シーン遷移・フェード")]
     [SerializeField] private Image fadeImage;
-    [SerializeField] private float fadeDuration = 1.5f;
+    [SerializeField] private float fadeDuration = 1.5f; // 暗くなるのにかかる時間
+    [SerializeField] private float endingFadeDelay = 2.0f; // ★追加：上昇開始から暗くなり始めるまでの待機時間
     [SerializeField] private string nextSceneName = "TitleScene";
 
     [Header("状態フラグ")]
@@ -25,6 +26,7 @@ public class Elevator : MonoBehaviour
     public bool isEnding = false;
 
     private bool movingSwitch = true;
+    private bool hasStartedEndingSequence = false; // ★追加：フェード処理が重複して呼ばれないためのフラグ
 
     [Header("サウンド設定")]
     [SerializeField] private AudioClip elevatorSound;
@@ -33,8 +35,17 @@ public class Elevator : MonoBehaviour
     private Rigidbody2D playerRb;
     private Player playerScript;
 
+    private Rigidbody2D elevatorRb;
+
     void Start()
     {
+        elevatorRb = GetComponent<Rigidbody2D>();
+        if (elevatorRb == null)
+        {
+            elevatorRb = gameObject.AddComponent<Rigidbody2D>();
+        }
+        elevatorRb.bodyType = RigidbodyType2D.Kinematic;
+
         transform.position = new Vector2(elevatorX, elevatorY);
         audioSource = GetComponent<AudioSource>();
 
@@ -53,13 +64,11 @@ public class Elevator : MonoBehaviour
         }
     }
 
-    // ★ 変更：Update にあった移動処理をなくしました
     void Update()
     {
-        // アニメーションや入力などがあればここに書きますが、移動処理は書きません
+        // 移動処理は書かない
     }
 
-    // ★ 変更：物理演算と同じタイミングでエレベーターを動かします
     void FixedUpdate()
     {
         if (isOpening)
@@ -83,35 +92,41 @@ public class Elevator : MonoBehaviour
 
     public void EndingElevator()
     {
+        // ★変更：Endingが始まった瞬間に、一度だけタイマー（フェード処理）をスタートさせる
+        if (!hasStartedEndingSequence)
+        {
+            hasStartedEndingSequence = true;
+            StartCoroutine(WaitAndFadeOutAndChangeScene());
+        }
+
+        // エレベーター自体の移動はそのまま続ける（目的地に着いたら移動を止めるだけ）
         MoveElevator(endingTargetPosition, () =>
         {
             isEnding = false;
-
-            if (fadeImage != null)
-            {
-                StartCoroutine(FadeOutAndChangeScene());
-            }
-            else
-            {
-                SceneManager.LoadScene(nextSceneName);
-            }
         });
     }
 
-    private IEnumerator FadeOutAndChangeScene()
+    // ★変更：指定時間（endingFadeDelay）待ってからフェードアウトとシーン遷移を行う
+    private IEnumerator WaitAndFadeOutAndChangeScene()
     {
-        fadeImage.gameObject.SetActive(true);
-        Color color = fadeImage.color;
-        color = Color.black;
-        color.a = 0f;
-        float timer = 0f;
+        // 指定した秒数だけ待機
+        yield return new WaitForSeconds(endingFadeDelay);
 
-        while (timer < fadeDuration)
+        if (fadeImage != null)
         {
-            timer += Time.deltaTime;
-            color.a = Mathf.Clamp01(timer / fadeDuration);
-            fadeImage.color = color;
-            yield return null;
+            fadeImage.gameObject.SetActive(true);
+            Color color = fadeImage.color;
+            color = Color.black;
+            color.a = 0f;
+            float timer = 0f;
+
+            while (timer < fadeDuration)
+            {
+                timer += Time.deltaTime;
+                color.a = Mathf.Clamp01(timer / fadeDuration);
+                fadeImage.color = color;
+                yield return null;
+            }
         }
 
         SceneManager.LoadScene(nextSceneName);
@@ -126,16 +141,17 @@ public class Elevator : MonoBehaviour
             movingSwitch = false;
         }
 
-        // ★変更：FixedUpdate で動かすため、Time.deltaTime ではなく Time.fixedDeltaTime を使用します
-        transform.position = Vector2.MoveTowards(
-            transform.position,
+        Vector2 nextPos = Vector2.MoveTowards(
+            elevatorRb.position,
             target,
             moveSpeed * Time.fixedDeltaTime
         );
 
-        if (Vector2.Distance(transform.position, target) < 0.01f)
+        elevatorRb.MovePosition(nextPos);
+
+        if (Vector2.Distance(elevatorRb.position, target) < 0.01f)
         {
-            transform.position = target;
+            elevatorRb.position = target;
             audioSource.Stop();
             movingSwitch = true;
             onArrived?.Invoke();
@@ -154,6 +170,8 @@ public class Elevator : MonoBehaviour
 
     private void OnTriggerExit2D(Collider2D collision)
     {
+        if (!gameObject.activeInHierarchy) return;
+
         if (collision.gameObject.CompareTag("Player"))
         {
             collision.transform.SetParent(null);

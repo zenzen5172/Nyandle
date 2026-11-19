@@ -33836,7 +33836,7 @@ MonoBehaviour:
   elevatorY: 28
   moveSpeed: 3
   openingTargetPosition: {x: -42.5, y: -2}
-  endingTargetPosition: {x: 0, y: 0}
+  endingTargetPosition: {x: -42.5, y: 30}
   fadeImage: {fileID: 0}
   fadeDuration: 1.5
   nextSceneName: TitleScene
@@ -36182,7 +36182,7 @@ GameObject:
   - component: {fileID: 1450630815}
   - component: {fileID: 1450630817}
   - component: {fileID: 1450630816}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: ElevatorFloor
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -267007,6 +267007,7 @@ MonoBehaviour:
   deathSound: {fileID: 8300000, guid: 3b4e807a6576701439554ad279911b3b, type: 3}
   flameSound: {fileID: 8300000, guid: 95914d4b8efc61f46be7a6158b2baff8, type: 3}
   arrowShotSound: {fileID: 0}
+  isGrounded: 0
   maxJumpCount: 0
   jumpCount: 0
   groundJumpSpent: 0

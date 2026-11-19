@@ -26,7 +26,7 @@ public class FadeTextOnIdle : MonoBehaviour
             {
                 if (text != null)
                 {
-                    text.gameObject.SetActive(true);
+                    text.gameObject.SetActive(false);
                     Color c = text.color;
                     c.a = 0f;
                     text.color = c;
