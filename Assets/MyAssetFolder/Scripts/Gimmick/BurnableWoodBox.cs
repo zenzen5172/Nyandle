@@ -30,22 +30,6 @@ public class BurnableWoodBox : MonoBehaviour
 
     void OnDestroy() => Player.OnRespawn -= ResetBox;
 
-    void OnCollisionEnter2D(Collision2D collision) => TryIgniteFromJumpFire(collision);
-
-    void OnCollisionStay2D(Collision2D collision) => TryIgniteFromJumpFire(collision);
-
-    void TryIgniteFromJumpFire(Collision2D collision)
-    {
-        if (isBurning || isBurned) return;
-
-        Rigidbody2D otherBody = collision.rigidbody;
-        if (otherBody != null && otherBody.TryGetComponent(out Player player)
-            && player.CanBurnWoodBoxes && player.IsJumpFireActive)
-        {
-            Ignite();
-        }
-    }
-
     public void Ignite()
     {
         if (!isActiveAndEnabled || isBurning || isBurned) return;
