@@ -122,8 +122,9 @@ public class Player : MonoBehaviour
 
     float intervalArrowTimer;           // 次に撃てるまでの残り時間（0なら撃てる）
     float currentAimAngle;              // 水平からの角度（上がプラス）
-    Vector2 bowBaseLocalPosition;       // 右向き時の弓のローカル位置
-    Vector3 bowBaseLocalScale;
+    [Header("弓の表示位置（実行中もここで調整可能）")]
+    public Vector2 bowBaseLocalPosition = new Vector2(0.5f, 0f);
+    public Vector3 bowBaseLocalScale = new Vector3(1f, 1f, 1f);
     LineRenderer aimGuide;
     Material runtimeAimGuideMaterial;
 
@@ -174,9 +175,8 @@ public class Player : MonoBehaviour
         // 🌟【追加】最初は弓矢を非表示にしておく
         if (bowAndArrow != null)
         {
-            bowBaseLocalPosition = bowAndArrow.transform.localPosition;
-            bowBaseLocalPosition.x = Mathf.Abs(bowBaseLocalPosition.x);
-            bowBaseLocalScale = bowAndArrow.transform.localScale;
+            // 位置はInspectorの設定値を優先するため、ここでの取得は行わない
+            if (bowBaseLocalScale == Vector3.zero) bowBaseLocalScale = Vector3.one;
             bowAndArrow.SetActive(false);
         }
     }
@@ -545,6 +545,13 @@ public class Player : MonoBehaviour
 
     Vector2 BowWorldPosition()
     {
+        if (bowAndArrow != null)
+        {
+            // 弓オブジェクトの現在のワールド座標をそのまま返す
+            return bowAndArrow.transform.position;
+        }
+
+        // もし弓オブジェクトが無かった場合の予備
         Vector2 local = new Vector2(bowBaseLocalPosition.x * FacingSign, bowBaseLocalPosition.y);
         return transform.TransformPoint(local);
     }

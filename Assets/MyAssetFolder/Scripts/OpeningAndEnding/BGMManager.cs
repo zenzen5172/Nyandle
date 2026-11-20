@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 
 public class BGMManager : MonoBehaviour
@@ -5,6 +6,9 @@ public class BGMManager : MonoBehaviour
     private bool isBGM = false;
     private AudioSource audioSource;
     private Collider2D childCollider;
+
+    // フェードアウトにかかる時間（秒）
+    [SerializeField] private float fadeDuration = 1.0f;
 
     void Start()
     {
@@ -32,7 +36,8 @@ public class BGMManager : MonoBehaviour
             }
             else
             {
-                audioSource.Stop();
+                // Stop()の代わりにコルーチンを呼び出してフェードアウトを開始する
+                StartCoroutine(FadeOutBGM());
                 isBGM = false;
             }
 
@@ -46,5 +51,27 @@ public class BGMManager : MonoBehaviour
                 // childCollider.enabled = false; 
             }
         }
+    }
+
+    // フェードアウトを実行するコルーチン
+    private IEnumerator FadeOutBGM()
+    {
+        // 現在の音量を保存（通常は1.0などの設定値）
+        float startVolume = audioSource.volume;
+        float time = 0f;
+
+        // 指定した時間（fadeDuration）をかけて音量を0まで下げる
+        while (time < fadeDuration)
+        {
+            time += Time.deltaTime;
+            audioSource.volume = Mathf.Lerp(startVolume, 0f, time / fadeDuration);
+            yield return null; // 次のフレームまで待機
+        }
+
+        // 完全に音が消えたら再生を停止
+        audioSource.Stop();
+
+        // 次に audioSource.Play() が呼ばれた時に音が鳴るよう、元の音量に戻しておく
+        audioSource.volume = startVolume;
     }
 }

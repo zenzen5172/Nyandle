@@ -84,7 +84,7 @@ AnimatorController:
   m_Name: Bow
   serializedVersion: 6
   m_AnimatorParameters:
-  - m_Name: changeArrow
+  - m_Name: chargeArrow
     m_Type: 9
     m_DefaultFloat: 0
     m_DefaultInt: 0
@@ -154,7 +154,7 @@ AnimatorStateTransition:
   m_Name: 
   m_Conditions:
   - m_ConditionMode: 1
-    m_ConditionEvent: changeArrow
+    m_ConditionEvent: chargeArrow
     m_EventTreshold: 0
   m_DstStateMachine: {fileID: 0}
   m_DstState: {fileID: 6038681929665484852}
