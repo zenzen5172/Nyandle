@@ -39,6 +39,7 @@ public class Elevator : MonoBehaviour
 
     void Start()
     {
+
         elevatorRb = GetComponent<Rigidbody2D>();
         if (elevatorRb == null)
         {

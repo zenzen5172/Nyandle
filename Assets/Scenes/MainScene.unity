@@ -270846,6 +270846,7 @@ MonoBehaviour:
   jumpCount: 0
   groundJumpSpent: 0
   bowAndArrow: {fileID: 1827853869}
+  bowAnimator: {fileID: 1827853872}
   arrowPrefab: {fileID: 7040979992950165805, guid: 5144c61cabd0c4e42a0585ff99d9bf2e, type: 3}
   arrowSpawnPoint: {fileID: 94588668}
   swingSpeed: 1
@@ -271482,6 +271483,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1827853870}
   - component: {fileID: 1827853871}
+  - component: {fileID: 1827853872}
   m_Layer: 3
   m_Name: Bow
   m_TagString: Untagged
@@ -271498,8 +271500,8 @@ Transform:
   m_GameObject: {fileID: 1827853869}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.54, y: 0.13, z: 0}
-  m_LocalScale: {x: 0.1541766, y: 0.1541766, z: 0.1541766}
+  m_LocalPosition: {x: 0.427, y: 0.021, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1800142072}
@@ -271553,8 +271555,8 @@ SpriteRenderer:
   m_SortingLayer: 8
   m_SortingOrder: 0
   m_MaskInteraction: 0
-  m_Sprite: {fileID: 7482667652216324306, guid: 311925a002f4447b3a28927169b83ea6, type: 3}
-  m_Color: {r: 0.5801887, g: 0.33118367, b: 0.26820046, a: 1}
+  m_Sprite: {fileID: -2134669699097908312, guid: 26948b746232f5345b4acf1c272e5f92, type: 3}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
@@ -271563,6 +271565,28 @@ SpriteRenderer:
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
   m_SpriteSortPoint: 0
+--- !u!95 &1827853872
+Animator:
+  serializedVersion: 7
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1827853869}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: 656020ad33fe8b643b5bca958c5e2c7c, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_AnimatePhysics: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0
 --- !u!1001 &1828256175
 PrefabInstance:
   m_ObjectHideFlags: 0

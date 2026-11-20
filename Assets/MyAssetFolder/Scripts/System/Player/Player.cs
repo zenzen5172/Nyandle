@@ -101,6 +101,7 @@ public class Player : MonoBehaviour
     // 🌟【追加】弓矢に関する設定
     [Header("弓矢(Mキー)")]
     public GameObject bowAndArrow;      // 構えている用の弓矢オブジェクト(Playerの子オブジェクト)
+    public Animator bowAnimator;        // 🌟【ここを追加】弓矢のアニメーター
     public GameObject arrowPrefab;      // 発射する矢のプレハブ
     public Transform arrowSpawnPoint;   // 矢が発射される位置と向き（構え中は毎フレーム弓の先に合わせて動かす）
     public float swingSpeed = 5f;       // 振り子の往復スピード
@@ -465,16 +466,29 @@ public class Player : MonoBehaviour
     // M押す → chargeArrow / M長押し → targetArrow（射出方向が上下に往復） / M離す → shotArrow で発射
     void HandleBowInput(Keyboard kb)
     {
-        // Mキーを押した瞬間：構えてタイマーをリセット（インターバル中は構えられない）
         if (kb.mKey.wasPressedThisFrame && !isAiming && intervalArrowTimer <= 0f)
         {
             isAiming = true;
             aimTimer = 0f;
             currentAimAngle = 0f;
-            if (bowAndArrow != null) bowAndArrow.SetActive(true);
+
+            if (bowAndArrow != null)
+            {
+                // 先にオブジェクトをアクティブにする
+                bowAndArrow.SetActive(true);
+            }
             if (aimGuide != null) aimGuide.enabled = true;
-            SetAnimTrigger("chargeArrow");
+
+            // ★ ここから変更 ★
             UpdateBowPose();
+            // Animatorが完全にアクティブになってからTriggerを送るように、強制的にステートを上書き再生するのも手です
+            if (bowAnimator != null)
+            {
+                // Triggerではなく、直接ステート名（"火の弓矢 引っ張る_Clip"）を指定して強制的に再生開始する
+                bowAnimator.Play("火の弓矢 引っ張る_Clip", 0, 0f);
+            }
+            // ★ ここまで変更 ★
+
             return;
         }
 
@@ -492,7 +506,9 @@ public class Player : MonoBehaviour
                 return;
             }
 
-            SetAnimBool("targetArrow", true);
+            // 変更前：SetAnimBool("targetArrow", true);
+            // 変更後：
+            SetBowAnimBool("targetArrow", true);
 
             // 水平(0度)から始まって、上下に弧を描くように往復する
             currentAimAngle = Mathf.Sin(aimTimer * swingSpeed) * swingAngle;
@@ -507,8 +523,11 @@ public class Player : MonoBehaviour
             Vector2 spawnPos = ArrowSpawnPosition(dir);
 
             HideBow();
-            SetAnimBool("targetArrow", false);
-            SetAnimTrigger("shotArrow");
+            // 変更前：SetAnimBool("targetArrow", false);
+            // 変更前：SetAnimTrigger("shotArrow");
+            // 変更後：
+            SetBowAnimBool("targetArrow", false);
+            SetBowAnimTrigger("shotArrow");
 
             ShootArrow(spawnPos, dir);
             intervalArrowTimer = intervalArrow;
@@ -841,6 +860,16 @@ public class Player : MonoBehaviour
         {
             spriteRenderer.flipX = true;
         }
+    }
+
+    // 🌟【追加】弓矢専用のアニメーション呼び出し
+    void SetBowAnimTrigger(string paramName)
+    {
+        if (bowAnimator != null) bowAnimator.SetTrigger(paramName);
+    }
+    void SetBowAnimBool(string paramName, bool value)
+    {
+        if (bowAnimator != null) bowAnimator.SetBool(paramName, value);
     }
 
     private void OnDrawGizmosSelected()
