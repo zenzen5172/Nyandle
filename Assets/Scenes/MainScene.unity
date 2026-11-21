@@ -276680,7 +276680,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::NewMonoBehaviourScript
   targetPlayer: {fileID: 1800142072}
   targetTexts:
-  - {fileID: 2129192245}
+  - {fileID: 851294927}
   timeToWait: 2
   fadeInSpeed: 2
   fadeOutSpeed: 6

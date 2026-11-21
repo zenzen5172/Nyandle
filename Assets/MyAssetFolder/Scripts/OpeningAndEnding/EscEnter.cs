@@ -12,13 +12,13 @@ public class EscEnter : MonoBehaviour
         }
 
         // テスト2：Escが押された瞬間に反応するか
-        if (Input.GetKeyDown(KeyCode.Escape))
+        if (Input.GetKeyDown(KeyCode.LeftControl))
         {
             Debug.Log("Escキーが認識されました");
         }
 
         // 本命の処理
-        if (Input.GetKey(KeyCode.LeftShift) && Input.GetKeyDown(KeyCode.Escape))
+        if (Input.GetKey(KeyCode.LeftShift) && Input.GetKeyDown(KeyCode.LeftControl))
         {
             Debug.Log("同時押し成功！シーン移動を実行します");
             SceneManager.LoadScene("TitleScene");
