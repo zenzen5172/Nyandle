@@ -166,10 +166,36 @@ public class WoodBoxJumpSystem : MonoBehaviour
     }
 
     // 木箱をプレイヤーに固定して、頭の上に乗せたまま運ぶ。
+    // 木箱をプレイヤーに固定して、頭の上に乗せたまま運ぶ。
     bool CarryBox(Rigidbody2D box, BoxCollider2D boxCollider)
     {
         if (carriedBox != null || box == null || boxCollider == null || !box.simulated) return false;
+
+        // 追加1：Rigidbodyのコンストレイントで「X位置」または「Y位置」が固定されている箱は掴まない
+        if ((box.constraints & RigidbodyConstraints2D.FreezePositionX) != 0 ||
+            (box.constraints & RigidbodyConstraints2D.FreezePositionY) != 0)
+        {
+            return false;
+        }
+
         if (HasActiveJoint(box)) return false;
+
+        // 🌟 追加2：上に別の箱や天井が接している場合は、重くて掴めない（通常の物理衝突で突き上げさせる）
+        Vector3 scale = boxCollider.transform.lossyScale;
+        Vector2 size = Vector2.Scale(boxCollider.size, new Vector2(Mathf.Abs(scale.x), Mathf.Abs(scale.y)));
+        Vector2 center = (Vector2)box.transform.position + (Vector2)boxCollider.transform.TransformVector(boxCollider.offset);
+
+        // 箱を上方向に少し(0.1f)だけ仮想移動させ、上に何か乗っていないか調べる (横幅は0.95倍して壁との擦れ誤判定を防ぐ)
+        int hitCount = Physics2D.BoxCast(center, size * 0.95f, boxCollider.transform.eulerAngles.z, Vector2.up, wallFilter, wallHits, 0.1f);
+        for (int i = 0; i < hitCount; i++)
+        {
+            Collider2D hitCol = wallHits[i].collider;
+            // 自分自身やプレイヤー以外にぶつかったら「上に何かが乗っている」と判断して掴むのをやめる
+            if (hitCol != boxCollider && hitCol.attachedRigidbody != playerBody && !hitCol.isTrigger && !hitCol.usedByEffector)
+            {
+                return false;
+            }
+        }
 
         SpriteRenderer renderer = box.GetComponent<SpriteRenderer>();
         if (renderer == null || !renderer.enabled) return false;
@@ -182,8 +208,10 @@ public class WoodBoxJumpSystem : MonoBehaviour
         contactHeight = previousPosition.y;
         carryOffset = box.transform.position - new Vector3(previousPosition.x, previousPosition.y, transform.position.z);
         boxCenterOffset = (Vector2)carryOffset + (Vector2)boxCollider.transform.TransformVector(boxCollider.offset);
-        Vector3 scale = boxCollider.transform.lossyScale;
-        boxSize = Vector2.Scale(boxCollider.size, new Vector2(Mathf.Abs(scale.x), Mathf.Abs(scale.y)));
+
+        // 修正：上で計算した size をそのまま使う（重複エラー回避）
+        boxSize = size;
+
         boxAngle = boxCollider.transform.eulerAngles.z;
         box.linearVelocity = Vector2.zero;
         box.angularVelocity = 0f;

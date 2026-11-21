@@ -1769,7 +1769,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: "Ctrl+Shift\u3067\u3084\u3081\u308B"
+  m_text: "Shift+Esc\u3067\u3084\u3081\u308B"
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: dada88546d6c4494e90abc4ae9572b89, type: 2}
   m_sharedMaterial: {fileID: -5794628568676118958, guid: dada88546d6c4494e90abc4ae9572b89, type: 2}
