@@ -2,6 +2,7 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using System.Collections;
+using TMPro;
 
 public class Elevator : MonoBehaviour
 {
@@ -28,11 +29,20 @@ public class Elevator : MonoBehaviour
     [SerializeField] private float delayBeforeAscend = 1.0f;
     [SerializeField] private float delayBeforeFade = 2.0f;
     [SerializeField] private float fullFadeDuration = 4.0f;
-    [SerializeField] private float spaceEnableOffset = 2.0f;
-    [SerializeField] private float spaceTextDelay = 1.5f;
 
     [SerializeField] private Image fadeImage;
     [SerializeField] private string nextSceneName = "TitleScene";
+
+    [Header("名前入力設定")]
+    [SerializeField] private TMP_InputField nameInputField;
+    [SerializeField] private GameObject nameInputPanel;
+    [SerializeField, Range(0f, 1f)] private float inputPanelShowTiming = 0.7f;
+
+    // ★追加：一文字ずつ表示する案内テキストの設定
+    [Header("案内テキスト設定")]
+    [SerializeField] private TextMeshProUGUI promptText;
+    [SerializeField] private string promptMessage = "なまえを入力してEnter";
+    [SerializeField] private float promptTextSpeed = 0.1f;
 
     [Header("状態フラグ")]
     public bool isOpening = true;
@@ -42,14 +52,13 @@ public class Elevator : MonoBehaviour
     private bool movingSwitch = true;
     private bool hasStartedEndingSequence = false;
     private bool canAscend = false;
-
     private bool isCameraLocked = false;
     private Vector3 lockedCameraPosition;
     private float lockedCameraSize;
 
     [Header("サウンド設定")]
     [SerializeField] private AudioClip elevatorSound;
-    [SerializeField] private float audioStartDelay = 0.5f; // ★乗ってから音が鳴るまでの一瞬の間
+    [SerializeField] private float audioStartDelay = 0.5f;
     [SerializeField] private float audioFadeDuration = 1.0f;
     public AudioSource audioSource;
     private Rigidbody2D elevatorRb;
@@ -80,6 +89,9 @@ public class Elevator : MonoBehaviour
             fadeImage.color = c;
         }
 
+        if (nameInputPanel != null) nameInputPanel.SetActive(false);
+        if (promptText != null) promptText.text = ""; // ★最初は文字を空にしておく
+
         if (mainCamera == null) mainCamera = Camera.main;
     }
 
@@ -108,10 +120,7 @@ public class Elevator : MonoBehaviour
         if (!hasStartedEndingSequence)
         {
             hasStartedEndingSequence = true;
-
-            // ★追加：エンディングに入った瞬間（エレベーターに乗った直後）に、一瞬遅らせて音を鳴らす
             StartCoroutine(PlayEndingAudioImmediately());
-
             StartCoroutine(EndingSequence());
         }
 
@@ -121,11 +130,9 @@ public class Elevator : MonoBehaviour
         }
     }
 
-    // ★追加：エンディングに入った直後に一瞬遅れてエレベーター音を再生する
     private IEnumerator PlayEndingAudioImmediately()
     {
         yield return new WaitForSeconds(audioStartDelay);
-
         if (audioSource != null)
         {
             audioSource.volume = initialVolume;
@@ -145,7 +152,6 @@ public class Elevator : MonoBehaviour
 
         StartCoroutine(StartResultTextWithDelay());
 
-        // 1. カメラスライド演出
         if (mainCamera != null)
         {
             float originalSize = mainCamera.orthographicSize;
@@ -184,64 +190,102 @@ public class Elevator : MonoBehaviour
         }
 
         yield return new WaitForSeconds(delayBeforeAscend);
-
         canAscend = true;
-
         yield return new WaitForSeconds(delayBeforeFade);
 
         if (fadeImage != null) fadeImage.gameObject.SetActive(true);
 
         float fadeTimer = 0f;
-        bool canPressSpace = false;
-        bool hasShownSpaceText = false;
-        float timeSinceSpaceEnabled = 0f;
+        bool isPanelShown = false;
 
-        while (true)
+        while (fadeTimer < fullFadeDuration)
         {
-            if (fadeTimer < fullFadeDuration)
+            fadeTimer += Time.deltaTime;
+            float progress = fadeTimer / fullFadeDuration;
+
+            if (fadeImage != null)
             {
-                fadeTimer += Time.deltaTime;
-                float progress = fadeTimer / fullFadeDuration;
-
-                if (fadeImage != null)
-                {
-                    Color c = fadeImage.color;
-                    c.a = Mathf.Clamp01(progress);
-                    fadeImage.color = c;
-                }
-
-                if (audioSource != null && audioSource.isPlaying && isEnding)
-                {
-                    audioSource.volume = Mathf.Lerp(initialVolume, 0f, progress);
-                }
+                Color c = fadeImage.color;
+                c.a = Mathf.Clamp01(progress);
+                fadeImage.color = c;
             }
 
-            if (!canPressSpace && fadeTimer >= (fullFadeDuration - spaceEnableOffset))
+            if (audioSource != null && audioSource.isPlaying && isEnding)
             {
-                canPressSpace = true;
+                audioSource.volume = Mathf.Lerp(initialVolume, 0f, progress);
             }
 
-            if (canPressSpace && !hasShownSpaceText)
+            if (!isPanelShown && progress >= inputPanelShowTiming)
             {
-                timeSinceSpaceEnabled += Time.deltaTime;
-                if (timeSinceSpaceEnabled >= spaceTextDelay)
+                isPanelShown = true;
+                if (nameInputPanel != null)
                 {
-                    hasShownSpaceText = true;
-                    Result result = GetComponent<Result>();
-                    if (result == null) result = FindObjectOfType<Result>();
-                    if (result != null) result.ShowSpacePrompt();
-                }
-            }
+                    nameInputPanel.SetActive(true);
 
-            if (canPressSpace && Input.GetKeyDown(KeyCode.Space))
-            {
-                break;
+                    // ★追加：パネルが出た瞬間に、一文字ずつ表示するコルーチンをスタート
+                    if (promptText != null)
+                    {
+                        StartCoroutine(ShowPromptTextCoroutine());
+                    }
+
+                    if (nameInputField != null)
+                    {
+                        nameInputField.Select();
+                        nameInputField.ActivateInputField();
+                    }
+                }
             }
 
             yield return null;
         }
 
+        if (!isPanelShown && nameInputPanel != null)
+        {
+            nameInputPanel.SetActive(true);
+            if (promptText != null) StartCoroutine(ShowPromptTextCoroutine());
+            if (nameInputField != null)
+            {
+                nameInputField.Select();
+                nameInputField.ActivateInputField();
+            }
+        }
+
+        if (nameInputPanel != null)
+        {
+            bool isNameEntered = false;
+            while (!isNameEntered)
+            {
+                if (Input.GetKeyDown(KeyCode.Return) || Input.GetKeyDown(KeyCode.KeypadEnter))
+                {
+                    isNameEntered = true;
+                }
+                yield return null;
+            }
+
+            string enteredName = (nameInputField != null) ? nameInputField.text : "";
+            Result result = GetComponent<Result>();
+            if (result == null) result = FindObjectOfType<Result>();
+            if (result != null) result.SaveRecordWithName(enteredName);
+        }
+        else
+        {
+            Result result = GetComponent<Result>();
+            if (result == null) result = FindObjectOfType<Result>();
+            if (result != null) result.SaveRecordWithName("");
+        }
+
         SceneManager.LoadScene(nextSceneName);
+    }
+
+    // ★追加：一文字ずつ表示するための処理
+    private IEnumerator ShowPromptTextCoroutine()
+    {
+        promptText.text = "";
+        foreach (char c in promptMessage)
+        {
+            promptText.text += c;
+            yield return new WaitForSeconds(promptTextSpeed);
+        }
     }
 
     private IEnumerator StartResultTextWithDelay()
@@ -258,8 +302,6 @@ public class Elevator : MonoBehaviour
         if (movingSwitch)
         {
             movingSwitch = false;
-
-            // ★変更：オープニング時のみ、移動開始から遅れて音を鳴らす（エンディング時はすでに鳴っているため重複再生を防ぐ）
             if (isOpening)
             {
                 StartCoroutine(PlayElevatorAudioWithDelay());
@@ -282,7 +324,6 @@ public class Elevator : MonoBehaviour
     private IEnumerator PlayElevatorAudioWithDelay()
     {
         yield return new WaitForSeconds(audioStartDelay);
-
         if (!movingSwitch && audioSource != null)
         {
             audioSource.volume = initialVolume;

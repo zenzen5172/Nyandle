@@ -8,7 +8,7 @@ public class Result : MonoBehaviour
     [SerializeField] private TextMeshProUGUI timeInCave;
     [SerializeField] private TextMeshProUGUI numberOfTorch;
 
-    [Header("Space案内用TMP")]
+    [Header("Space案内用TMP")] // ← ※これはもう使わないかもしれませんが念のため残しておきます
     [SerializeField] private TextMeshProUGUI spacePromptText;
     [SerializeField] private float spaceFadeDuration = 2.0f;
     [SerializeField, Range(0f, 1f)] private float spaceMaxAlpha = 0.6f;
@@ -17,6 +17,11 @@ public class Result : MonoBehaviour
     [SerializeField] private float textSpeed = 0.1f;
 
     private CaveTimer caveTimer;
+
+    // ★保存用に変数をクラス全体で保持するように変更
+    private float finalTime;
+    private int finalActiveCount;
+    private int finalTotalCount;
 
     void Start()
     {
@@ -30,14 +35,17 @@ public class Result : MonoBehaviour
 
     public IEnumerator ShowResultUI()
     {
+        // 時間と松明の数を計算して保持しておく
+        finalTime = (caveTimer != null) ? caveTimer.caveTime : 0f;
+        (finalActiveCount, finalTotalCount) = CountTorches();
+
         if (timeInCave != null)
         {
             timeInCave.transform.SetAsLastSibling();
             timeInCave.gameObject.SetActive(true);
             timeInCave.text = "";
 
-            float time = (caveTimer != null) ? caveTimer.caveTime : 0f;
-            string timeText = "Time: " + time.ToString("F2") + "s";
+            string timeText = "Time: " + finalTime.ToString("F2") + "s";
 
             foreach (char c in timeText)
             {
@@ -54,9 +62,7 @@ public class Result : MonoBehaviour
             numberOfTorch.gameObject.SetActive(true);
             numberOfTorch.text = "";
 
-            (int activeCount, int totalCount) = CountTorches();
-
-            string torchText = $"Torches: {activeCount} / {totalCount}";
+            string torchText = $"Torches: {finalActiveCount} / {finalTotalCount}";
 
             foreach (char c in torchText)
             {
@@ -64,6 +70,14 @@ public class Result : MonoBehaviour
                 yield return new WaitForSeconds(textSpeed);
             }
         }
+
+        // ★ 注意：ここにあった RankingManager.AddRecord は削除しました！
+    }
+
+    // ★追加：Elevator.csから、名前入力が終わったタイミングで呼ばれる保存用メソッド
+    public void SaveRecordWithName(string playerName)
+    {
+        RankingManager.AddRecord(playerName, finalTime, finalActiveCount, finalTotalCount);
     }
 
     public void ShowSpacePrompt()
@@ -96,8 +110,6 @@ public class Result : MonoBehaviour
         spacePromptText.color = c;
     }
 
-    // ★変更：直下だけでなく、孫やひ孫オブジェクトまで奥深く「Fire」を探すように改良
-    // ★大文字小文字を合わせ、親の「TorchSets」を除外して「TorchSet (○)」だけを正確に数える
     private (int active, int total) CountTorches()
     {
         int activeCount = 0;
@@ -107,7 +119,6 @@ public class Result : MonoBehaviour
 
         foreach (GameObject obj in allObjects)
         {
-            // 「TorchSet」を含み、かつ親フォルダの「TorchSets」ではないものを探す
             if (obj.name.Contains("TorchSet") && obj.name != "TorchSets")
             {
                 totalCount++;
@@ -119,8 +130,6 @@ public class Result : MonoBehaviour
                 }
             }
         }
-
-        Debug.Log($"松明カウント結果: {activeCount} / {totalCount}");
         return (activeCount, totalCount);
     }
 }

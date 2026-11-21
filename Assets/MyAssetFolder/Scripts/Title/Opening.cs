@@ -27,6 +27,12 @@ public class Opening : MonoBehaviour
 
     void Update()
     {
+        // ★追加：ランキングが開いている間は、画面を進行させない（ここで処理を止める）
+        if (TitleResultDisplay.isRankingOpen)
+        {
+            return;
+        }
+
         // 修正1: openingCount がリストの要素数より小さい時だけ実行する（範囲外エラーを防止）
         if (openingCount < openingScenes.Count)
         {

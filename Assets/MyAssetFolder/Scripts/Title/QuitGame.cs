@@ -6,9 +6,8 @@ public class GameQuitManager : MonoBehaviour
     {
         // Shiftキー（左または右）が押されているかを判定
         bool isShiftPressed = Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift);
-
         // Shiftキーを押している状態で、Escキーが押された瞬間
-        if (isShiftPressed && Input.GetKeyDown(KeyCode.Escape))
+        if (isShiftPressed && Input.GetKeyDown(KeyCode.LeftControl))
         {
             QuitGame();
         }
